@@ -1,0 +1,222 @@
+{
+  "plan": {
+    "backend": "lexical",
+    "answer_mode": "single_call",
+    "sources": [
+      "okh_rag",
+      "hypergraph_rag",
+      "text_rag",
+      "graph_rag"
+    ],
+    "shuffle_trajectory": false,
+    "scenario_limit": 8,
+    "question_limit": 200,
+    "seed": 42
+  },
+  "llm": {
+    "generator_model": "gpt-4o",
+    "generation_temperature": 0.0
+  },
+  "evaluation": {
+    "td_scoring": "exact_match",
+    "overall": "micro",
+    "exclude_unanswerable": true,
+    "sa_relative_tolerance": 0.01,
+    "sa_absolute_floor": 1e-06
+  },
+  "generator_calls": 800,
+  "results": {
+    "okh_rag": {
+      "by_format": {
+        "TF": 0.75,
+        "MC": 0.31666666666666665,
+        "NU": 0.04081632653061224,
+        "DE": 0.0
+      },
+      "counts": {
+        "TF": [
+          12,
+          12
+        ],
+        "MC": [
+          60,
+          60
+        ],
+        "NU": [
+          49,
+          76
+        ],
+        "DE": [
+          51,
+          52
+        ]
+      },
+      "micro": 0.1744186046511628,
+      "macro": 0.27687074829931974,
+      "overall": 0.1744186046511628,
+      "overall_mode": "micro",
+      "reasons": {
+        "match": 30,
+        "mismatch": 142,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "exclusions": {
+        "total": 200,
+        "scorable": 172,
+        "unscorable": 28,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "source": "okh_rag",
+      "n_questions": 200,
+      "n_empty_context": 0,
+      "n_nonconforming_answers": 0,
+      "elapsed_s": 53.95
+    },
+    "hypergraph_rag": {
+      "by_format": {
+        "TF": 0.75,
+        "MC": 0.31666666666666665,
+        "NU": 0.04081632653061224,
+        "DE": 0.0
+      },
+      "counts": {
+        "TF": [
+          12,
+          12
+        ],
+        "MC": [
+          60,
+          60
+        ],
+        "NU": [
+          49,
+          76
+        ],
+        "DE": [
+          51,
+          52
+        ]
+      },
+      "micro": 0.1744186046511628,
+      "macro": 0.27687074829931974,
+      "overall": 0.1744186046511628,
+      "overall_mode": "micro",
+      "reasons": {
+        "match": 30,
+        "mismatch": 142,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "exclusions": {
+        "total": 200,
+        "scorable": 172,
+        "unscorable": 28,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "source": "hypergraph_rag",
+      "n_questions": 200,
+      "n_empty_context": 0,
+      "n_nonconforming_answers": 0,
+      "elapsed_s": 2.78
+    },
+    "text_rag": {
+      "by_format": {
+        "TF": 0.75,
+        "MC": 0.31666666666666665,
+        "NU": 0.04081632653061224,
+        "DE": 0.0
+      },
+      "counts": {
+        "TF": [
+          12,
+          12
+        ],
+        "MC": [
+          60,
+          60
+        ],
+        "NU": [
+          49,
+          76
+        ],
+        "DE": [
+          51,
+          52
+        ]
+      },
+      "micro": 0.1744186046511628,
+      "macro": 0.27687074829931974,
+      "overall": 0.1744186046511628,
+      "overall_mode": "micro",
+      "reasons": {
+        "match": 30,
+        "mismatch": 142,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "exclusions": {
+        "total": 200,
+        "scorable": 172,
+        "unscorable": 28,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "source": "text_rag",
+      "n_questions": 200,
+      "n_empty_context": 0,
+      "n_nonconforming_answers": 0,
+      "elapsed_s": 0.68
+    },
+    "graph_rag": {
+      "by_format": {
+        "TF": 0.75,
+        "MC": 0.31666666666666665,
+        "NU": 0.04081632653061224,
+        "DE": 0.0
+      },
+      "counts": {
+        "TF": [
+          12,
+          12
+        ],
+        "MC": [
+          60,
+          60
+        ],
+        "NU": [
+          49,
+          76
+        ],
+        "DE": [
+          51,
+          52
+        ]
+      },
+      "micro": 0.1744186046511628,
+      "macro": 0.27687074829931974,
+      "overall": 0.1744186046511628,
+      "overall_mode": "micro",
+      "reasons": {
+        "match": 30,
+        "mismatch": 142,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "exclusions": {
+        "total": 200,
+        "scorable": 172,
+        "unscorable": 28,
+        "not_numeric_gold": 26,
+        "unanswerable": 2
+      },
+      "source": "graph_rag",
+      "n_questions": 200,
+      "n_empty_context": 0,
+      "n_nonconforming_answers": 0,
+      "elapsed_s": 3.14
+    }
+  }
+}

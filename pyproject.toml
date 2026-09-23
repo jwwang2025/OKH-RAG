@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "okh-rag"
+version = "0.1.0"
+description = "Reproduction of 'Knowledge Is Not Static: Order-Aware Hypergraph RAG for Language Models' (arXiv:2604.12185)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+# §4.1 / §A.4 name the only two external models (GPT-4o, text-embedding-3-small); both are reached
+# through the `openai` SDK. torch is used for the learned low-rank bilinear transition model (§3.1
+# Eq. 3) because the contrastive objective (Eq. 4) needs autograd.
+dependencies = [
+    "torch>=2.0",
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+    "openai>=1.40",
+]
+
+[project.optional-dependencies]
+# `rapidfuzz` gives a much better relation-alias fuzzy match than difflib. §A.2 asks for "fuzzy
+# matching" without naming a library, so difflib (stdlib) is the default and rapidfuzz is an upgrade.
+fuzzy = ["rapidfuzz>=3.0"]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,347 @@
+# Configuration for OKH-RAG
+# Paper: "Knowledge Is Not Static: Order-Aware Hypergraph RAG for Language Models"
+#        https://arxiv.org/abs/2604.12185
+#
+# CONVENTION (enforced by scripts/check_config_citations.py)
+#   - a comment starting with "§" cites the paper section that specifies the value
+#   - "[UNSPECIFIED]" marks a value the paper never states; the comment must also list alternatives
+#   - "[CONTRADICTION]" marks a value where two parts of the paper disagree
+#
+# Every hyperparameter lives here. No magic numbers in src/.
+
+paper:
+  arxiv_id: "2604.12185"          # title page / arXiv listing
+  title: "Knowledge Is Not Static: Order-Aware Hypergraph RAG for Language Models"
+
+seed: 42                          # [UNSPECIFIED] — paper reports no seed. Alternatives: 0, 1234, any fixed int.
+                                  # Group-level splits make results seed-stable; per-example splits do not.
+
+paths:
+  # The released CyPortQA benchmark, vendored. The four files this project reads are
+  # dataset/CyPortQA.json, source_data/Encoded_senario.json, source_data/CyPortQA_template.json
+  # and source_data/CyPortQA_Imbalanced/*.json — the multimodal PNG trees are deliberately not
+  # vendored, because OKH-RAG is text-only. Provenance, schema and defects: data/CONTRACT.md.
+  data_dir: "data/raw/cyportqa"
+  reports_dir: "reports"          # audit and evaluation output
+  work_dir: "artifacts"           # all generated artifacts
+
+# ---------------------------------------------------------------------------
+# LLM / embedding backends
+# ---------------------------------------------------------------------------
+llm:
+  generator_model: "gpt-4o"                    # §4.1 — "the same generator (GPT-4o)"
+  embedding_model: "text-embedding-3-small"    # §A.4 — "embedded as he ∈ R^1536 via OpenAI text-embedding-3-small"
+  embedding_batch_size: 256                    # [UNSPECIFIED] — API batching size. Alternatives: 64, 512, 2048 (API limit).
+  extraction_temperature: 0.0                  # [UNSPECIFIED] — temperature for p_ext. Alternatives: 0.2, 1.0.
+                                               # 0.0 chosen because §A.2 dedups by "hashes of ... evidence text",
+                                               # so extraction is expected to be stable.
+  generation_temperature: 0.0                  # [UNSPECIFIED] — temperature for the answer generator. Alternatives: 0.3, 0.7.
+  judge_temperature: 0.0                       # [UNSPECIFIED] — §4.1 says GPT-4o judges TD answers but gives no sampling config.
+  max_retries: 3                               # [UNSPECIFIED] — Alternatives: 1, 5, none.
+  retry_base_delay_s: 1.0                      # [UNSPECIFIED] — exponential backoff 1s/2s/4s.
+  request_timeout_s: 120                       # [UNSPECIFIED] — Alternatives: 30, 300.
+  cache_dir: "artifacts/llm_cache"             # [UNSPECIFIED] — local response cache so reruns do not re-bill.
+
+# ---------------------------------------------------------------------------
+# §3.1 / §A.1–A.2 — knowledge hypergraph construction
+# ---------------------------------------------------------------------------
+hypergraph:
+  min_entity_set_size: 2          # §A.1 Eq. 7 — "V_e = {v1, ..., vm} ⊆ V: the participating entity set (m ≥ 2)"
+  min_confidence: 0.0             # §A.1 — c ∈ (0, 1]; we validate the interval but do not threshold by default
+  max_confidence: 1.0             # §A.1 — c ∈ (0, 1]
+
+  horizon:
+    # §4.1 — "multi-horizon descriptions from T-120 to T-12". The paper says each scenario covers
+    # "storm evolution, hazard forecasting, operational response, and impact prediction" across
+    # horizons; 10 offsets at 12-hour spacing span exactly T-120..T-12.
+    # CONFIRMED against the release: Encoded_senario.json keys every scenario's `time` block by
+    # exactly these ten lead times as strings. Scenarios are ragged — 39 hold 1 block, 119 hold 10 —
+    # and the 2,910 blocks in total climb this list from T-12 (471 blocks) down to T-120 (123).
+    offsets_hours: [120, 108, 96, 84, 72, 60, 48, 36, 24, 12]
+    # §A.2 — "detected via regex patterns such as 'T-48 hours before expected landfall:'"
+    # [PARTIALLY_SPECIFIED] the paper gives one example pattern; this regex generalizes it.
+    # Used only when the input is prose. CyPortQA's release does not need it: the lead time is
+    # already a key of the `time` mapping, so the extraction driver reads it rather than parsing it.
+    header_pattern: "(?im)^\\s*T-(?P<h>\\d{1,3})\\s*hours?\\s*before\\s+expected\\s+landfall\\s*:"
+    # §A.2 — "a canonical temporal anchor (horizon:T-48) is created for each detected horizon"
+    anchor_template: "horizon:T-{h}"
+
+  normalization:
+    # §A.2 step 1 — "mapped to R via the alias table and fuzzy matching"
+    fuzzy_threshold: 0.80         # [UNSPECIFIED] — Alternatives: 0.70, 0.90. Only used when exact and alias lookup both miss.
+    # §A.2 step 2 — "identifiers are rewritten to a hierarchical convention encoding family, storm, port,
+    # and horizon (e.g., wind_fcst:IRMA:port_arthur:T-48)"
+    entity_id_template: "{family}:{storm}:{port}:{horizon}"
+    # §A.2 step 4 — "for entity families at multiple horizons, synthetic hyperedges (forecast_updates_to,
+    # changes_probability_to) are created to represent evolution"
+    # [UNSPECIFIED] the paper names the two relations but not the set of families that receive them.
+    # "all" is the literal reading of "for entity families at multiple horizons", and is what §4.2's
+    # density claim requires: "nearly half of its hyperedges are cross-horizon transitions".
+    # Alternatives: a restricted list such as ["track_landfall", "probability", "hazard_forecast"],
+    # which leaves most real scenarios with no cross-horizon links at all.
+    # Family 13 is always excluded — those edges are already cross-horizon and carry no horizon to link.
+    cross_horizon_families: ["all"]
+    # [UNSPECIFIED] §A.2 does not bound the fan-out. Pairing every source state with every destination
+    # state at the next horizon is quadratic in a family's per-horizon size and grows the graph well past
+    # §4.2's ratio. Cap it instead: each source edge links to the `max_fanout` destination edges it
+    # shares the most entities with, ties broken by text position. Alternatives: 0 (no cap, quadratic),
+    # 2, 4.
+    cross_horizon_max_fanout: 1
+    cross_horizon_relation: "forecast_updates_to"        # §A.2 — named explicitly
+    cross_horizon_probability_relation: "changes_probability_to"  # §A.2 — named explicitly
+
+  dedup:
+    hash_algorithm: "sha1"        # §A.2 step 5 — "hashes of relation, entity set, and evidence text"; algorithm not named.
+                                  # [UNSPECIFIED] Alternatives: md5, blake2b, sha256.
+    hash_length: 16               # [UNSPECIFIED] — truncation length. Alternatives: 12, 32, full digest.
+    sort_entity_names: true       # [UNSPECIFIED] — set iteration order is not stable; sort before hashing so the
+                                  # hyperedge ID depends on the entity *set*, not on insertion order.
+
+# ---------------------------------------------------------------------------
+# §A.3 — precedence construction
+# ---------------------------------------------------------------------------
+precedence:
+  # §A.3 — "cyclone state → track → landfall → timing → advisory → probability → hazard → threshold →
+  #          operation → impact → recovery"
+  # [CONTRADICTION] §A.3 lists these 11 stages but Table 3 defines 13 relation families. Family 7
+  # (hazard observation), family 9 (additional hazards) and family 13 (cross-horizon) have no separate
+  # slot here. Family 2 splits across two stages (forecasts_track → "track", forecasts_landfall →
+  # "landfall"), so the relation→phase mapping in src/okh_rag/vocabulary.py is per-relation, not
+  # per-family. Family 13 is excluded from within-horizon ordering by the family-to-change rule below.
+  phase_order:
+    - cyclone_state
+    - track
+    - landfall
+    - timing
+    - advisory
+    - probability
+    - hazard
+    - threshold
+    - operation
+    - impact
+    - recovery
+
+  # §A.3 — "Hyperedges in the same semantic family at different horizons follow decreasing horizon
+  #          order: T-96 ≺ T-72 ≺ T-48 ≺ T-24 ≺ T-12"
+  cross_horizon_direction: "decreasing_lead_time"   # larger lead time (T-96) precedes smaller (T-12)
+
+  # §A.3 — "advisory ≺ hazard forecasts, hazard assessments ≺ operational decisions,
+  #          hazard assessments ≺ impact predictions, and impact predictions ≺ recovery status"
+  causal_chain_rules:
+    - ["advisory", "hazard"]
+    - ["hazard", "operation"]
+    - ["hazard", "impact"]
+    - ["impact", "recovery"]
+
+  # §A.3 — the tie-break order is stated but the sort algorithm is not.
+  # [UNSPECIFIED] Alternatives: Kahn's algorithm with a heap, DFS post-order with a sorted neighbour list.
+  tie_break_order: ["phase_rank", "family_rank", "lead_time", "text_position"]
+
+  # §A.3 claims the result is a DAG but no rule proves acyclicity when the four rule families are
+  # combined. [UNSPECIFIED] Alternatives: raise on cycle, drop the offending rules, break arbitrarily.
+  cycle_policy: "drop_lowest_priority_rule"   # drops family_to_change, then causal, then cross_horizon edges
+
+# ---------------------------------------------------------------------------
+# §3.1 Eq. 3 / §A.4 — learned transition model
+# ---------------------------------------------------------------------------
+order_model:
+  embedding_dim: 1536             # §A.4 — "Hyperedges are embedded as he ∈ R^1536"
+  rank: 64                        # §A.4 — "W = U^T V with U, V ∈ R^{64×1536}"  →  2·64·1536 = 196,608 params
+  l2_normalize_embeddings: false  # [UNSPECIFIED] Eq. 3 is written on raw h_e; L2-normalising would rescale the
+                                  # softmax logits. Alternatives: L2-normalise + learn a temperature.
+  init: "xavier_u_zero_v"         # [UNSPECIFIED] — Alternatives: both Xavier, both normal(0, 0.02).
+                                  # V=0 makes the initial P_θ exactly uniform, which avoids a random tie-break at step 0.
+
+# ---------------------------------------------------------------------------
+# §3.1 Eq. 4 / §A.4 — contrastive training
+# ---------------------------------------------------------------------------
+training:
+  # [CONTRADICTION] Eq. 4 writes L = E_P[−log P_θ] + α·E_N[log P_θ]. Since log P_θ ≤ 0, adding it
+  # rewards high probability on negatives — the opposite of a contrastive objective. §A.4's prose
+  # ("positive and negative ordered pairs") states the contrastive intent.
+  #   "minus"   → L = E_P[−log P_θ] − α·E_N[log P_θ]   ← default, matches the stated intent
+  #   "literal" → L = E_P[−log P_θ] + α·E_N[log P_θ]   ← Eq. 4 exactly as printed
+  # Measured (scripts/smoke_training.py, 10 synthetic groups): with "minus" the loss falls 10.99 → 8.28
+  # and E_P[log P_θ] rises to −4.00 against a uniform-softmax reference of −4.17. With "literal" the loss
+  # goes to −67.23 and E_P[log P_θ] collapses to −214.30: minimising the printed objective is unbounded
+  # below, because shrinking E_N[log P_θ] is rewarded without limit, and the negative term overwhelms the
+  # positive one. The literal form is kept so this is reproducible rather than asserted.
+  negative_term_sign: "minus"
+
+  alpha: 1.0                      # [UNSPECIFIED] — Eq. 4 introduces α with no value anywhere in the paper.
+                                  # Alternatives: 0.5, 2.0.
+  sampled_softmax_negatives: 64   # §A.4 — "sampled softmax with K = 64 global negatives per example"
+  sampled_softmax_correction: false  # [UNSPECIFIED] — §A.4 says "approximated", so no log Q(batch frequency)
+                                     # correction is applied. Alternatives: apply the full correction.
+
+  optimizer: "adamw"              # [UNSPECIFIED] — Alternatives: adam, sgd. §A.4 gives no optimizer.
+  lr: 1.0e-3                      # [UNSPECIFIED] — Alternatives: 1e-4, 3e-4.
+  betas: [0.9, 0.999]             # [UNSPECIFIED] — PyTorch AdamW defaults.
+  eps: 1.0e-8                     # [UNSPECIFIED] — PyTorch AdamW default.
+  weight_decay: 0.0               # [UNSPECIFIED] — no weight decay mentioned. Alternatives: 1e-2.
+  batch_size: 128                 # [UNSPECIFIED] — positive pairs per step. Alternatives: 64, 256.
+  epochs: 20                      # [UNSPECIFIED] — Alternatives: 50, 100.
+  early_stop_patience: 3          # [UNSPECIFIED] — epochs without val-loss improvement. Alternatives: 5, none.
+  gradient_clip_norm: 1.0         # [UNSPECIFIED] — Alternatives: 0.5, 5.0, none.
+
+  signals:
+    document_order: true          # §A.4 — "Document order (P_doc)"
+    entity_overlap: true          # §A.4 — "Entity-overlap consistency (P_ent)"
+    retrieval_induced: true       # §A.4 — "Retrieval-induced preference (P_ret)"
+  # §A.4 — "co-occurring hyperedges (e_i, e_j) with π(e_i) < π(e_j) ... to form positive ordered pairs".
+  # [UNSPECIFIED] "co-occurring" is not given a window. Using: consecutive pairs in the canonical
+  # trajectory (§A.3), i.e. a window of 1. Alternatives: a larger window (quadratic in group size),
+  # or all pairs (intractable at §4 scale).
+  document_order_window: 1
+  # §A.4 — the entity-overlap signal is "|V_ei ∩ V_ej| >= 1 within the same knowledge group".
+  # §A.2 step 3 adds a per-horizon temporal anchor to *every* horizon-grounded hyperedge, so literally
+  # every same-horizon pair overlaps and the signal degenerates into "same horizon". Anchors are
+  # therefore excluded by default, which makes the signal mean what §A.4's name for it says —
+  # entity continuity. Set false for the literal reading.
+  entity_overlap_ignore_anchors: true
+  retrieval_induced_rounds: 1     # [UNSPECIFIED] — §A.4 describes "a self-training loop" without a round count.
+                                  # Alternatives: 2, 3, until convergence.
+  retrieval_induced_min_accuracy: 1.0  # [UNSPECIFIED] — §A.4 says "retrieval traces from correct answers",
+                                       # implying only fully-correct QA samples contribute. Alternatives: 0.5.
+
+  split:
+    # [UNSPECIFIED] the paper reports no split. Splitting by knowledge group is required because
+    # hyperedges of one (storm, port) scenario share entities and would leak across a per-hyperedge split.
+    strategy: "by_knowledge_group"   # Alternatives: per_hyperedge (leaky), per_storm.
+    train: 0.8                       # Alternatives: 0.9 / 0.95 (paper-scale corpora usually train heavier).
+    val: 0.1
+    test: 0.1
+
+# ---------------------------------------------------------------------------
+# §3.2 Eq. 5 / §A.6–A.7 — order-aware retrieval
+# ---------------------------------------------------------------------------
+retrieval:
+  weights:                        # §4.1 — "default hyperparameters (λ, µ, ν, ρ) = (1.2, 0.3, 0.2, 0.5)"
+    lambda_: 1.2                  #   λ  — order coherence
+    mu: 0.3                       #   µ  — precedence consistency
+    nu: 0.2                       #   ν  — entity continuity
+    rho: 0.5                      #   ρ  — phase coverage
+
+  # [CONTRADICTION] Eq. 5 multiplies µ by the trajectory fraction Prec(γ); Algorithm 1 line 6 multiplies
+  # µ by the 0/1 indicator 1[e_{ℓ−1} ≺ e′]. Implemented per Eq. 5 (equations take precedence).
+  #   "fraction"  → Eq. 5     (default)
+  #   "indicator" → Algorithm 1 line 6
+  precedence_mode: "fraction"
+
+  # [CONTRADICTION] §A.6 Eq. 12 defines Ovlp(γ) as the *mean* Jaccard over consecutive pairs; Algorithm 1
+  # line 7 accumulates the raw Jaccard `J(V_e(ℓ−1), V_e′)`, i.e. the sum. Implemented per Eq. 5.
+  #   "mean" → Eq. 12         (default)
+  #   "sum"  → Algorithm 1 line 7
+  # The two differ by the constant factor (L−1) at fixed L, so they cannot change a ranking — only the
+  # scale of ν against the other three weights. Both are implemented so that claim is testable rather
+  # than asserted; tests/test_retrieval.py parametrizes over both modes. Alternatives: none — the pair
+  # is exhaustive.
+  overlap_mode: "mean"
+
+  # §A.7 — "The pool is capped at |C| = 150" with "40% of slots reserved for the query's own group".
+  # [PARTIALLY_SPECIFIED] the reserve can be read as a minimum satisfied before the general pool spends
+  # anything, or as a share *of* the 150. 40% of |C| = 150 is 60, and stage 1 already contributes K = 80,
+  # so the readings differ by a lot: under "quota" the group-aware expansion stage is left 10 slots,
+  # under "floor" it gets 70 whenever the anchors already supply 60 own-group hyperedges. "floor" is the
+  # default because it is the only reading under which the "group-aware expansion" half of §A.7's
+  # sentence does work beyond the reserve itself.
+  #   "floor" → the reserve is a minimum satisfied first            (default)
+  #   "quota" → the 150 slots contain the reserve: 90 general + 60
+  group_reserve_mode: "floor"
+
+  top_k: 80                       # §A.7 — "top-K (K=80) cosine retrieval from the global index"
+  candidate_pool_size: 150        # §A.7 — "The pool is capped at |C| = 150"
+  group_reserve_fraction: 0.40    # §A.7 — "40% of slots reserved for the query's own group when known"
+
+  beam_width: 8                   # §4.1 — "beam search with B = 8"
+  beam_length: 8                  # §4.1 — "L = 8"
+  num_trajectories: 3             # §4.1 — "N = 3"
+  beam_initial_multiplier: 2      # §A.7 Algorithm 1 line 2 — "B ← top-2B singletons by Rel(e, q)"
+
+  diversity_penalty: 0.1          # [UNSPECIFIED] — Algorithm 1 line 10 says "Apply diversity penalty"
+                                  # without a formula. Alternatives: 0.0 (off), 0.5, MMR-style λ.
+                                  # Applied as: score −= penalty · (#already-retained beams sharing this head).
+
+  # §A.6 Eq. 13 — Cov(γ) = |{φ(e_k)} ∩ S| / |S|. The definition of S is TRUNCATED in the PDF
+  # ("S = {advisory, hazard_forecast, hazard_observation, operation_stat"). §3.2 glosses the same set as
+  # 5 stages ("advisory → hazard → operation → impact → recovery"). The truncated text proves
+  # hazard_forecast and hazard_observation are distinct members, so the 6-member set is used.
+  phase_set:
+    - advisory
+    - hazard_forecast
+    - hazard_observation
+    - operation_status
+    - impact
+    - recovery
+
+# ---------------------------------------------------------------------------
+# §3.3 / §A.8 — retrieval-augmented generation
+# ---------------------------------------------------------------------------
+generation:
+  # §A.8 — "The single-call mode presents all N trajectories as numbered reasoning paths in one prompt"
+  #         "The single-call mode is preferred", so it is the default.
+  mode: "single_call"             # Alternatives: "per_trajectory" (the §A.8 fallback mode).
+  include_quality_summary: true   # §A.8 — "A trajectory-level quality summary is prepended when available"
+  include_reasoning_tags: true    # §A.8 — the "Reasoning:" line in the evidence block
+
+# ---------------------------------------------------------------------------
+# §4.1 — evaluation
+# ---------------------------------------------------------------------------
+evaluation:
+  judge_model: "gpt-4o"           # §4.1 — "an LLM-judged semantic score in [0, 1] using GPT-4o as the evaluator"
+  # [SIMPLIFICATION] §4.1's judge is not needed on this release. All 24,094 text-description
+  # answers are byte-identical to the field their template declares, so normalised exact match
+  # already scores them perfectly and the judge can only add sampling variance. TD is therefore
+  # scored by exact match; set `td_scoring: "llm_judge"` to reproduce §4.1 literally and to show
+  # the judge does not change the ranking. See data/CONTRACT.md §5.2.
+  td_scoring: "exact_match"       # Alternatives: "llm_judge" (§4.1 as written).
+  sa_relative_tolerance: 1.0e-2   # [PARTIALLY_SPECIFIED] §4.1 says "tolerance-based accuracy" without a value.
+                                  # Alternatives: 1e-1 (coarse), 1e-3 (strict).
+  sa_absolute_floor: 1.0e-6       # [UNSPECIFIED] — absolute tolerance floor so near-zero targets are not
+                                  # forced to be exactly equal. Alternatives: 1e-8, 0 (exact).
+  case_sensitive: false           # [UNSPECIFIED] — §4.1 says "exact match" without normalization rules.
+                                  # Alternatives: true. TF/MC answers are canonicalized to Yes/No/letter first.
+  # [CONTRADICTION] Table 1's "Overall" is not the macro-average of the four columns (Text-RAG averages
+  # to 0.374, the table reports 0.287). A micro-average over all questions is consistent with the table.
+  overall: "micro"                # Alternatives: "macro" (mean of the four type accuracies).
+  # Measured on the release: 8,337 of 117,178 answers are placeholders that the *encoding* cannot
+  # supply (7,660 "None", 677 ""), so they are unanswerable rather than hard. Scoring them measures
+  # nothing; excluding them from the denominator is the only honest option, and the count is
+  # reported alongside every accuracy so the exclusion is visible.
+  exclude_unanswerable: true      # Alternatives: false (score them as wrong, which conflates a
+                                  # data gap with a reasoning failure).
+
+# ---------------------------------------------------------------------------
+# §4.1 — baselines
+# ---------------------------------------------------------------------------
+baselines:
+  text_rag:
+    chunking: "horizon_block"     # [UNSPECIFIED] — §4.1 says "unstructured text chunks" without a size.
+                                  # Alternatives: fixed_token, sentence_window.
+    top_k: 8                      # [UNSPECIFIED] — §4.1 says "top-k results" without a k. Matched to the
+                                  # beam length L = 8 so all methods see a comparable evidence budget.
+  graph_rag:
+    # §4.1 — "retrieves over a binary knowledge graph using graph traversal and community summarization",
+    # citing Edge et al. 2024. [PARTIALLY_SPECIFIED] — the full GraphRAG pipeline (Leiden communities,
+    # community reports) is defined in [11], not here. This baseline is an approximation, documented in
+    # REPRODUCTION_NOTES.md.
+    expansion_hops: 1             # [UNSPECIFIED] — Alternatives: 2, 3.
+    include_pairwise_edges: true  # binary KG = every hyperedge decomposed into its pairwise edges
+  hypergraph_rag:
+    # §4.1 — "retrieves unordered hyperedges from the same knowledge hypergraph H without modeling order".
+    # This is exactly the λ=µ=ν=ρ=0 case of Eq. 5, which §3.2 confirms: "setting all to zero recovers
+    # standard top-k retrieval".
+    top_k: 8                      # [UNSPECIFIED] — matched to the beam length L = 8.
+
+# ---------------------------------------------------------------------------
+# §4.5 / Table 2 — ablation switches
+# ---------------------------------------------------------------------------
+ablation:
+  shuffle_trajectory: false       # Table 2 "Shuffle" row — permute the retrieved trajectory, keep content
+  drop_lambda: false              # Table 2 "−λ (order coherence)"
+  drop_mu: false                  # Table 2 "−µ (precedence)"
+  drop_nu: false                  # Table 2 "−ν (entity continuity)"
+  drop_rho: false                 # Table 2 "−ρ (phase coverage)"
+  # Table 2 "Transition" group. "no order" == order-free retrieval, "heuristic order" == the §A.3
+  # rules only with no learned model, "learned order" == the full model.
+  transition_variant: "learned"   # Alternatives: "heuristic", "none"

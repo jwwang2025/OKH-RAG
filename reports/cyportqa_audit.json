@@ -1,0 +1,1363 @@
+{
+  "data_root": "data\\raw\\cyportqa",
+  "corpus": {
+    "scenarios": 472,
+    "scenario_keys_with_encoding": 472,
+    "knowledge_groups": 472,
+    "horizon_blocks": 2910,
+    "questions": 117178,
+    "questions_answerable": 108841,
+    "questions_unanswerable": 8337,
+    "questions_without_port_in_context": 31945,
+    "storms": 69,
+    "ports": 45,
+    "answers_by_format": {
+      "DE": 24094,
+      "MC": 37813,
+      "NU": 49459,
+      "TF": 5812
+    },
+    "questions_by_stage": {
+      "S1": 84244,
+      "S2": 31502,
+      "S3": 1432
+    }
+  },
+  "declared_horizons": [
+    12,
+    24,
+    36,
+    48,
+    60,
+    72,
+    84,
+    96,
+    108,
+    120
+  ],
+  "answer_format_tags": [
+    "DE",
+    "MC",
+    "NU",
+    "TF"
+  ],
+  "templates": [
+    {
+      "template_id": "Q1",
+      "answer_format": "TF",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.within_uncertainty_cone",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2908
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q2",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.under_watch",
+      "n_records": 2873,
+      "verdicts": {
+        "match": 2870,
+        "mismatch": 3
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "BARRY_2019_New_Orleans,_LA|Q2|-|T-60",
+          "shipped": "Tropical Storm",
+          "expected": "Hurricane Watch, Tropical Storm Watch, Storm Surge Watch",
+          "path": "weather_observation.under_watch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "BARRY_2019_Plaquemines_Port_District,_LA|Q2|-|T-60",
+          "shipped": "Tropical Storm",
+          "expected": "Hurricane Watch, Tropical Storm Watch, Storm Surge Watch",
+          "path": "weather_observation.under_watch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "IDA_2021_Plaquemines_Port_District,_LA|Q2|-|T-36",
+          "shipped": "None",
+          "expected": "Storm Surge Watch (west of port) / None for tropical-cyclone class",
+          "path": "weather_observation.under_watch",
+          "detail": "option text differs from ground truth"
+        }
+      ],
+      "agreement": 0.9989557953358859,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q3",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.under_warning",
+      "n_records": 2902,
+      "verdicts": {
+        "match": 2899,
+        "mismatch": 3
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "ISAIAS_2020_Wilmington,_NC|Q3|-|T-12",
+          "shipped": "Tropical Storm",
+          "expected": "Hurricane Warning (also Storm Surge Warning and nested Tropical Storm Warning for broader area)",
+          "path": "weather_observation.under_warning",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "MARCO_2020_South_Louisiana,_LA,_Port_of|Q3|-|T-36",
+          "shipped": "Tropical Storm",
+          "expected": "Hurricane Warning (also Storm Surge Warning, Tropical Storm Warning for Lakes Pontchartrain & Maurepas/Metro New Orleans)",
+          "path": "weather_observation.under_warning",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ZETA_2020_Port_of_Greater_Baton_Rouge,_LA|Q3|-|T-24",
+          "shipped": "Tropical Storm",
+          "expected": "Hurricane Warning (coastal zone) / Inland Tropical Storm Warning likely",
+          "path": "weather_observation.under_warning",
+          "detail": "option text differs from ground truth"
+        }
+      ],
+      "agreement": 0.9989662301860786,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q4",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.watch_coast",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2562,
+        "unanswerable": 347
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q5",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.warning_coast",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2539,
+        "unanswerable": 370
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q6",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.coordinates",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q7",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.motion.direction",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q8",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.motion.speed",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q9",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.impacted_coast",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2909
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q10",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.closest_wind_data_location",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2772,
+        "unanswerable": 137
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q11",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.culmulative_wind_34kt",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2908,
+        "unanswerable": 1
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q12",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.culmulative_wind_50kt",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2907,
+        "unanswerable": 1
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q13",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.time_to_34kt_max",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2843,
+        "unanswerable": 65
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q14",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.time_to_50kt_max",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2586,
+        "unanswerable": 322
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q15",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.34kt_max",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2907,
+        "unanswerable": 1
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q16",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "port.name",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q17",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.impacted_coast",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2909
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q18",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.category",
+      "n_records": 2851,
+      "verdicts": {
+        "match": 2789,
+        "mismatch": 62
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "ALEX_2022_Jacksonville,_FL|Q18|-|T-48",
+          "shipped": "Tropical Storm",
+          "expected": "Potential Tropical Cyclone / Sub-Tropical Storm strength (≤39 mph)",
+          "path": "cyclone_condition_and_forecast.category",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ALEX_2022_Port_Everglades,_FL|Q18|-|T-36",
+          "shipped": "Tropical Storm",
+          "expected": "Potential Tropical Storm / below Category 1",
+          "path": "cyclone_condition_and_forecast.category",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ALEX_2022_Port_Everglades,_FL|Q18|-|T-48",
+          "shipped": "Tropical Storm",
+          "expected": "Potential Tropical Cyclone / developing Tropical Storm",
+          "path": "cyclone_condition_and_forecast.category",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ANA_2015_Baltimore,_MD|Q18|-|T-48",
+          "shipped": "Tropical Storm",
+          "expected": "Subtropical Storm",
+          "path": "cyclone_condition_and_forecast.category",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ANA_2015_Baltimore,_MD|Q18|-|T-60",
+          "shipped": "Tropical Storm",
+          "expected": "Subtropical Storm",
+          "path": "cyclone_condition_and_forecast.category",
+          "detail": "option text differs from ground truth"
+        }
+      ],
+      "agreement": 0.9782532444756226,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q19",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "port.name",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q20",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.impacted_coast",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2909
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q21",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.hours_to_landfall",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2872,
+        "unanswerable": 38
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q22",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.hours_to_offshore",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2836,
+        "unanswerable": 74
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q23",
+      "answer_format": "MC",
+      "semantics": "ordinal_bucket",
+      "stage": "S1",
+      "declared_path": "weather_observation.forecast_window",
+      "n_records": 2909,
+      "verdicts": {
+        "match": 2909
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q24",
+      "answer_format": "MC",
+      "semantics": "ordinal_bucket",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.hours_of_strike",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2765,
+        "mismatch": 26,
+        "indeterminate": 119
+      },
+      "n_ambiguous": 374,
+      "examples": [
+        {
+          "qa_id": "BARRY_2019_Beaumont,_TX|Q24|-|T-72",
+          "shipped": "0 hours",
+          "expected": "≈24",
+          "path": "cyclone_condition_and_forecast.hours_of_strike",
+          "detail": "value 24 falls in buckets ['C', 'D'], not in A"
+        },
+        {
+          "qa_id": "BETA_2020_Calhoun_Port_Authority,_TX|Q24|-|T-72",
+          "shipped": "0 hours",
+          "expected": "30-36",
+          "path": "cyclone_condition_and_forecast.hours_of_strike",
+          "detail": "value 30 falls in buckets ['D'], not in A"
+        },
+        {
+          "qa_id": "CLAUDETTE_2021_Port_of_Savannah,_GA|Q24|-|T-12",
+          "shipped": "0 hours",
+          "expected": "≈18",
+          "path": "cyclone_condition_and_forecast.hours_of_strike",
+          "detail": "value 18 falls in buckets ['C'], not in A"
+        },
+        {
+          "qa_id": "CLAUDETTE_2021_Wilmington,_DE|Q24|-|T-12",
+          "shipped": "0 hours",
+          "expected": "≈6",
+          "path": "cyclone_condition_and_forecast.hours_of_strike",
+          "detail": "value 6 falls in buckets ['B'], not in A"
+        },
+        {
+          "qa_id": "CRISTOBAL_2020_Plaquemines_Port_District,_LA|Q24|-|T-24",
+          "shipped": "0 hours",
+          "expected": "≈12",
+          "path": "cyclone_condition_and_forecast.hours_of_strike",
+          "detail": "value 12 falls in buckets ['B'], not in A"
+        }
+      ],
+      "agreement": 0.9906843425295593,
+      "determinacy": 0.8659978502328914
+    },
+    {
+      "template_id": "Q25",
+      "answer_format": "MC",
+      "semantics": "ordinal_bucket",
+      "stage": "S1",
+      "declared_path": "weather_observation.time_to_34kt_max",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2402,
+        "indeterminate": 373,
+        "mismatch": 133
+      },
+      "n_ambiguous": 354,
+      "examples": [
+        {
+          "qa_id": "ANA_2015_Port_of_Charleston,_SC|Q25|-|T-12",
+          "shipped": "12-24 Hours",
+          "expected": "6",
+          "path": "weather_observation.time_to_34kt_max",
+          "detail": "value 6 falls in buckets ['A'], not in B"
+        },
+        {
+          "qa_id": "ANA_2015_Port_of_Savannah,_GA|Q25|-|T-60",
+          "shipped": "12-24 Hours",
+          "expected": "6",
+          "path": "weather_observation.time_to_34kt_max",
+          "detail": "value 6 falls in buckets ['A'], not in B"
+        },
+        {
+          "qa_id": "ANA_2015_Wilmington,_NC|Q25|-|T-12",
+          "shipped": "12-24 Hours",
+          "expected": "6",
+          "path": "weather_observation.time_to_34kt_max",
+          "detail": "value 6 falls in buckets ['A'], not in B"
+        },
+        {
+          "qa_id": "ANA_2015_Wilmington,_NC|Q25|-|T-24",
+          "shipped": "12-24 Hours",
+          "expected": "6",
+          "path": "weather_observation.time_to_34kt_max",
+          "detail": "value 6 falls in buckets ['A'], not in B"
+        },
+        {
+          "qa_id": "ARTHUR_2020_Jacksonville,_FL|Q25|-|T-12",
+          "shipped": "12-24 Hours",
+          "expected": "6",
+          "path": "weather_observation.time_to_34kt_max",
+          "detail": "value 6 falls in buckets ['A'], not in B"
+        }
+      ],
+      "agreement": 0.947534516765286,
+      "determinacy": 0.8603550295857988
+    },
+    {
+      "template_id": "Q26",
+      "answer_format": "TF",
+      "semantics": "threshold_predicate",
+      "stage": "S1",
+      "declared_path": "weather_observation.34kt_max",
+      "n_records": 2904,
+      "verdicts": {
+        "match": 2903,
+        "indeterminate": 1
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q27",
+      "answer_format": "MC",
+      "semantics": "ordinal_bucket",
+      "stage": "S1",
+      "declared_path": "weather_observation.time_to_34kt_non_zero",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2504,
+        "indeterminate": 373,
+        "mismatch": 31
+      },
+      "n_ambiguous": 1003,
+      "examples": [
+        {
+          "qa_id": "BARRY_2019_Kansas_City_Port_Authority,_MO|Q27|-|T-12",
+          "shipped": "0 hours",
+          "expected": ">120",
+          "path": "weather_observation.time_to_34kt_non_zero",
+          "detail": "value 120 falls in buckets ['D'], not in A"
+        },
+        {
+          "qa_id": "BARRY_2019_Kansas_City_Port_Authority,_MO|Q27|-|T-60",
+          "shipped": "0 hours",
+          "expected": "≈72",
+          "path": "weather_observation.time_to_34kt_non_zero",
+          "detail": "value 72 falls in buckets ['D'], not in A"
+        },
+        {
+          "qa_id": "BETA_2020_Corpus_Christi,_TX|Q27|-|T-48",
+          "shipped": "0 hours",
+          "expected": "≈12",
+          "path": "weather_observation.time_to_34kt_non_zero",
+          "detail": "value 12 falls in buckets ['B'], not in A"
+        },
+        {
+          "qa_id": "CLAUDETTE_2021_Port_of_Savannah,_GA|Q27|-|T-12",
+          "shipped": "0 hours",
+          "expected": "≈36",
+          "path": "weather_observation.time_to_34kt_non_zero",
+          "detail": "value 36 falls in buckets ['C'], not in A"
+        },
+        {
+          "qa_id": "CLAUDETTE_2021_Texas_City,_TX|Q27|-|T-12",
+          "shipped": "0 hours",
+          "expected": "≈12",
+          "path": "weather_observation.time_to_34kt_non_zero",
+          "detail": "value 12 falls in buckets ['B'], not in A"
+        }
+      ],
+      "agreement": 0.9877712031558186,
+      "determinacy": 0.6043392504930967
+    },
+    {
+      "template_id": "Q28",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "cyclone_condition_and_forecast.hours_to_landfall",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2872,
+        "unanswerable": 38
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q29",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S1",
+      "declared_path": "weather_observation.first_hazard",
+      "n_records": 2896,
+      "verdicts": {
+        "match": 2896
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q30",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "weather_observation.storm_surge_above_3_feet",
+      "n_records": 2749,
+      "verdicts": {
+        "match": 2731,
+        "mismatch": 18
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "BARRY_2019_Port_Arthur,_TX|Q30|-|T-48",
+          "shipped": "Unlikely",
+          "expected": "No, unlikely for Port Arthur",
+          "path": "weather_observation.storm_surge_above_3_feet",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "CINDY_2017_Galveston,_TX|Q30|-|T-12",
+          "shipped": "No",
+          "expected": "Possible but not likely to exceed 3 ft",
+          "path": "weather_observation.storm_surge_above_3_feet",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "FLORENCE_2018_Baltimore,_MD|Q30|-|T-84",
+          "shipped": "No",
+          "expected": "Possible but not yet forecast",
+          "path": "weather_observation.storm_surge_above_3_feet",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "FLORENCE_2018_Port_of_Savannah,_GA|Q30|-|T-108",
+          "shipped": "No",
+          "expected": "Possible but not likely",
+          "path": "weather_observation.storm_surge_above_3_feet",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "FLORENCE_2018_Virginia,_VA,_Port_of|Q30|-|T-84",
+          "shipped": "Possible",
+          "expected": "Likely (3–5 ft possible at and just south of port)",
+          "path": "weather_observation.storm_surge_above_3_feet",
+          "detail": "option text differs from ground truth"
+        }
+      ],
+      "agreement": 0.9934521644234267,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q31",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "weather_observation.rain_fall_above_4_inch",
+      "n_records": 2567,
+      "verdicts": {
+        "match": 2536,
+        "mismatch": 31
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "CLAUDETTE_2021_Lake_Charles_Harbor_District,_LA|Q31|-|T-24",
+          "shipped": "Possible",
+          "expected": "Likely (4–6 inches possible)",
+          "path": "weather_observation.rain_fall_above_4_inch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "COLIN_2016_Jacksonville,_FL|Q31|-|T-24",
+          "shipped": "Possible",
+          "expected": "Likely (3–5 inches expected, isolated 8 inches possible)",
+          "path": "weather_observation.rain_fall_above_4_inch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "CRISTOBAL_2020_South_Louisiana,_LA,_Port_of|Q31|-|T-24",
+          "shipped": "No",
+          "expected": "Possible if northward track verifies",
+          "path": "weather_observation.rain_fall_above_4_inch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "DELTA_2020_Beaumont,_TX|Q31|-|T-72",
+          "shipped": "Possible",
+          "expected": "Likely (4–8 inches with isolated 12\" possible)",
+          "path": "weather_observation.rain_fall_above_4_inch",
+          "detail": "option text differs from ground truth"
+        },
+        {
+          "qa_id": "ELSA_2021_PortMiami,_FL|Q31|-|T-120",
+          "shipped": "No",
+          "expected": "Possible but not likely; expected rainfall generally 2–4 inches",
+          "path": "weather_observation.rain_fall_above_4_inch",
+          "detail": "option text differs from ground truth"
+        }
+      ],
+      "agreement": 0.987923646279704,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q32",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "weather_observation.other_hazards",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2635,
+        "unanswerable": 273
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q33",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "weather_observation.gale_probability",
+      "n_records": 2908,
+      "verdicts": {
+        "match": 2908
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q34",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.start_impact_date",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 1576,
+        "unanswerable": 1334
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q35",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.max_impact_date",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 1576,
+        "unanswerable": 1334
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q36",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.day_of_recover",
+      "n_records": 2910,
+      "verdicts": {
+        "mismatch": 1571,
+        "unanswerable": 1334,
+        "match": 5
+      },
+      "n_ambiguous": 0,
+      "examples": [
+        {
+          "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q36|-|T-12",
+          "shipped": "6/3/2022",
+          "expected": 4.0,
+          "path": "impact_prediction.day_of_recover",
+          "detail": "|6.0 - 4.0| > 0.04"
+        },
+        {
+          "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q36|-|T-24",
+          "shipped": "6/3/2022",
+          "expected": 4.0,
+          "path": "impact_prediction.day_of_recover",
+          "detail": "|6.0 - 4.0| > 0.04"
+        },
+        {
+          "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q36|-|T-36",
+          "shipped": "6/3/2022",
+          "expected": 4.0,
+          "path": "impact_prediction.day_of_recover",
+          "detail": "|6.0 - 4.0| > 0.04"
+        },
+        {
+          "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q36|-|T-48",
+          "shipped": "6/3/2022",
+          "expected": 4.0,
+          "path": "impact_prediction.day_of_recover",
+          "detail": "|6.0 - 4.0| > 0.04"
+        },
+        {
+          "qa_id": "ALEX_2022_Port_Everglades,_FL|Q36|-|T-12",
+          "shipped": "6/4/2022",
+          "expected": 3.0,
+          "path": "impact_prediction.day_of_recover",
+          "detail": "|6.0 - 3.0| > 0.03"
+        }
+      ],
+      "agreement": 0.0031725888324873096,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q37",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.day_of_impact",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 2910
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q38",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.day_of_recover",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 1576,
+        "unanswerable": 1334
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q39",
+      "answer_format": "NU",
+      "semantics": "lookup",
+      "stage": "S2",
+      "declared_path": "impact_prediction.max_impact",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 1576,
+        "unanswerable": 1334
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q40",
+      "answer_format": "MC",
+      "semantics": "ordinal_bucket",
+      "stage": "S2",
+      "declared_path": "impact_prediction.total_impact_value",
+      "n_records": 2910,
+      "verdicts": {
+        "match": 1576,
+        "indeterminate": 1334
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q41",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.now.Condition",
+      "n_records": 117,
+      "verdicts": {
+        "match": 117
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q42",
+      "answer_format": "MC",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.<key>.Condition",
+      "n_records": 493,
+      "verdicts": {
+        "match": 493
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q43",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.now.VesselOps",
+      "n_records": 53,
+      "verdicts": {
+        "match": 53
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q44",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.now.OceanVesselOps",
+      "n_records": 53,
+      "verdicts": {
+        "match": 53
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q45",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.now.FacilityOps",
+      "n_records": 53,
+      "verdicts": {
+        "match": 53
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q46",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.<key>.VesselOps",
+      "n_records": 221,
+      "verdicts": {
+        "match": 221
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q47",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.<key>.OceanVesselOps",
+      "n_records": 221,
+      "verdicts": {
+        "match": 221
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    },
+    {
+      "template_id": "Q48",
+      "answer_format": "DE",
+      "semantics": "lookup",
+      "stage": "S3",
+      "declared_path": "operation.<key>.FacilityOps",
+      "n_records": 221,
+      "verdicts": {
+        "match": 221
+      },
+      "n_ambiguous": 0,
+      "examples": [],
+      "agreement": 1.0,
+      "determinacy": 1.0
+    }
+  ],
+  "defects": {
+    "qa-answer-placeholder-none": {
+      "measured": {
+        "literal_none": 7660,
+        "empty_string": 677,
+        "share_unanswerable": 0.0711,
+        "horizon_blocks_with_empty_operation": 2560,
+        "horizon_blocks_whose_impact_prediction_is_the_string_None": 1334,
+        "top_templates": [
+          [
+            "Q34",
+            1334
+          ],
+          [
+            "Q35",
+            1334
+          ],
+          [
+            "Q36",
+            1334
+          ],
+          [
+            "Q38",
+            1334
+          ],
+          [
+            "Q39",
+            1334
+          ]
+        ]
+      },
+      "verdict": "reproduced",
+      "severity": "label",
+      "summary": "7,660 QA records ship the literal string \"None\" as their answer and 677 ship an empty string — together 7.1% of the benchmark. Importantly, most of these are faithful copies rather than generation failures: the encoding itself stores the *string* \"None\" (not JSON null) in `impact_prediction` for 4,002 (scenario, horizon) pairs, and the QA generator copied it through. The underlying gap is in the source data — the AIS-derived impact predictions are unavailable for those scenarios — so these questions are unanswerable from the encoding by construction, not merely by accident. The rest correlate with `operation`, which is empty in 2,560 of 2,910 horizon blocks."
+    },
+    "template-q36-answer-field-mismatch": {
+      "measured": {
+        "q36_records": 2910,
+        "q36_equals_start_impact_date": 2910,
+        "q36_equals_end_impact_date": 1334,
+        "share_answering_from_start_field": 1.0,
+        "q34_q35_q36_groups": 2910,
+        "groups_where_all_three_agree": 2079
+      },
+      "verdict": "reproduced",
+      "severity": "label",
+      "summary": "Q36 asks 'When is the expected end of impact on freight?' and its template names `impact_prediction.day_of_recover` as the answer source, but the shipped answer is neither that field nor `end_impact_date`: it equals `start_impact_date` in 100% of the 2,910 cases (sample: ANA_2015 Savannah at every horizon answers 5/4/2015 while `end_impact_date` is 5/6/2015). Q34 and Q35 answer from the same value in 2,079 of 2,910 groups, so all three date questions collapse onto one field."
+    },
+    "qa-q33-answer-is-python-repr": {
+      "measured": {
+        "q33_records": 2908,
+        "parseable_as_json": 0,
+        "recovered_by_literal_eval": 2908
+      },
+      "verdict": "reproduced",
+      "severity": "format",
+      "summary": "Q33 says 'Answer with ONLY a JSON' but its ground truth is a Python `repr` of a dict, with single quotes and an unquoted-looking percentage: \"{'in 12h': '1%', 'in 24h': '3%', ...}\". `json.loads` rejects it."
+    },
+    "imbalanced-fragments-unterminated": {
+      "measured": {
+        "concat_parses_as_json": false,
+        "brace_depth_at_eof": 1,
+        "ended_inside_string": false,
+        "scenarios_recovered_by_scanner": 700,
+        "scanner_note": "recovered 700 scenario objects from the concatenated Imbalanced fragments (700 keys are present in the raw text); the stream never returns to brace depth 0, so records after the unterminated region are unrecoverable. final depth was 1 (expected 0)."
+      },
+      "verdict": "reproduced",
+      "severity": "blocking",
+      "summary": "`CyPortQA_Imbalanced_part1.json` and `_part2.json` are two fragments of one file cut mid-stream — part1 ends with `},` and part2 begins with a bare key — but concatenating them still does not yield valid JSON: a brace-depth scan that is string-aware shows the concatenation never returns to depth 0, so a container opened inside part2 is never closed. Per-part brace counts are 61,559/61,558 and 88,560/88,560; the second part should close one more brace than it opens."
+    },
+    "qa-context-arity-is-variable": {
+      "measured": {
+        "arity_3": 31945,
+        "arity_4": 85233,
+        "share_arity_3": 0.2726,
+        "three_element_only_templates": [
+          "Q4",
+          "Q5",
+          "Q6",
+          "Q7",
+          "Q8",
+          "Q9",
+          "Q17",
+          "Q18",
+          "Q20",
+          "Q21",
+          "Q23"
+        ]
+      },
+      "verdict": "reproduced",
+      "severity": "format",
+      "summary": "`context` is a positional array whose arity is not fixed: 85,233 records carry [port, storm, year, horizon] and 31,945 carry [storm, year, horizon] with the port omitted. The 3-element form is used by exactly the port-independent templates (Q4-Q9, Q17, Q18, Q20, Q21, Q23). Indexing `context[3]` positionally, as the array invites, silently reads the wrong field on 27% of the benchmark."
+    },
+    "mc-options-duplicated-and-inconsistent-with-prompt": {
+      "measured": {
+        "mc_records": 37813,
+        "records_with_choice_array": 37813,
+        "records_with_options_recovered": 37813,
+        "inline_matches_choice_length": 37813,
+        "records_where_prompt_clause_disagrees_with_choice_array": 0,
+        "records_where_question_clause_disagrees_with_choice_array": 2851,
+        "examples": [
+          {
+            "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q18|-|T-12",
+            "source": "question",
+            "clause_states": 4,
+            "choice_array_has": 7,
+            "inline_offers": 7
+          },
+          {
+            "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q18|-|T-24",
+            "source": "question",
+            "clause_states": 4,
+            "choice_array_has": 7,
+            "inline_offers": 7
+          },
+          {
+            "qa_id": "ALEX_2022_Canaveral_Port_District,_FL|Q18|-|T-36",
+            "source": "question",
+            "clause_states": 4,
+            "choice_array_has": 7,
+            "inline_offers": 7
+          }
+        ]
+      },
+      "verdict": "reproduced",
+      "severity": "format",
+      "summary": "All 37,813 multiple-choice records carry their options twice — as a structured `choice` array and inlined into the `question` string — and the two agree in length on every record. The inconsistency is in the *boilerplate*: both the `prompt` and the `question` open with a clause stating the option count in words, and the question's copy is stale on 2,851 records (all of Q18). Q18 asks for the SSHS category, offers A-G, and the prompt correctly says '(A, B, C, D, E, F or G)', but the question itself still says 'Answer with ONLY a choice (A, B, C, or D)'. The shipped answer is a bare letter with a trailing period ('B.'), so a consumer that trusts the question's own clause would truncate the option list to four and misread answers E-G."
+    },
+    "raw-categorical-fields-not-normalised": {
+      "measured": {
+        "distinct_category_strings": 123,
+        "categories_not_mapped_to_a_rung": 8,
+        "distinct_within_uncertainty_cone_strings": 21,
+        "distinct_under_watch_strings": 36,
+        "condition_spellings": {
+          "WHISKEY": 85,
+          "ZULU": 209,
+          "X-RAY": 105,
+          "YANKEE": 208,
+          "XRAY": 3
+        },
+        "condition_spellings_off_the_ladder": []
+      },
+      "verdict": "reproduced",
+      "severity": "format",
+      "summary": "Fields that §A.2 expects to normalise are shipped in raw natural-language form with hundreds of surface variants. Measured on `Encoded_senario.json`: `cyclone_condition_and_forecast.category` has 130+ distinct strings for what is really the SSHS ladder plus a pre-storm ladder (e.g. 'Category 2', 'Category 2 Hurricane', 'Category 2 (105-110 mph, forecast to reach major-hurricane strength)', 'Hurricane (Category 1 now - forecast to strengthen)'); `within_uncertainty_cone` has ~22 spellings of Yes/No; `under_watch` has ~40. `operation.Condition` is the one clean field, with the single exception of the `XRAY`/`X-RAY` split."
+    },
+    "ordinal-buckets-overlap": {
+      "measured": {
+        "templates": {
+          "Q23": {
+            "checked": 2909,
+            "ambiguous": 0,
+            "determinacy": 1.0,
+            "option_sets": [
+              [
+                "2 days",
+                "3 days",
+                "4 days",
+                "5 days"
+              ]
+            ],
+            "example_value": 5.0
+          },
+          "Q24": {
+            "checked": 2783,
+            "ambiguous": 374,
+            "determinacy": 0.8656,
+            "option_sets": [
+              [
+                "0 hours",
+                "1-12 Hours",
+                "13-24 hours",
+                "24 hours or more"
+              ]
+            ],
+            "example_value": 12.0
+          },
+          "Q25": {
+            "checked": 2522,
+            "ambiguous": 350,
+            "determinacy": 0.8612,
+            "option_sets": [
+              [
+                "0-12 hours",
+                "12-24 Hours",
+                "24-48 hours",
+                "48 hours or more"
+              ]
+            ],
+            "example_value": 96.0
+          },
+          "Q27": {
+            "checked": 2532,
+            "ambiguous": 1001,
+            "determinacy": 0.6047,
+            "option_sets": [
+              [
+                "0 hours",
+                "0-24 Hours",
+                "24-48 hours",
+                "48 hours or more"
+              ]
+            ],
+            "example_value": 96.0
+          },
+          "Q40": {
+            "checked": 2910,
+            "ambiguous": 0,
+            "determinacy": 1.0,
+            "option_sets": [
+              [
+                "None",
+                "1-10 vessels",
+                "10-20 vessels",
+                "20 vessels or more"
+              ]
+            ],
+            "example_value": 0.0
+          }
+        }
+      },
+      "verdict": "reproduced",
+      "severity": "label",
+      "summary": "Six templates (Q23, Q24, Q25, Q27, Q40 and Q26's predicate sibling) do not answer from their declared field directly: the field is a scalar that has to be placed in an ordinal bucket supplied by the question's options. Several of those bucket sets overlap, so one value satisfies two options and the question is not decidable from the encoding at all. Q25 offers '0-12 hours', '12-24 Hours', '24-48 hours', '48 hours or more', making 12, 24 and 48 each admissible under two options; Q27's '0 hours' and '0-24 Hours' both admit 0; Q24's '13-24 hours' and '24 hours or more' both admit 24. §4.1 scores these by exact letter match, so part of CyPortQA's headline accuracy is decided by an ambiguity the field cannot resolve."
+    },
+    "td-answers-are-verbatim-field-copies": {
+      "measured": {
+        "description_records": 24094,
+        "byte_identical_to_the_declared_field": 24094,
+        "share_verbatim": 1.0,
+        "templates": [
+          "Q4",
+          "Q5",
+          "Q7",
+          "Q9",
+          "Q10",
+          "Q17",
+          "Q20",
+          "Q32",
+          "Q43",
+          "Q44",
+          "Q45",
+          "Q46",
+          "Q47",
+          "Q48"
+        ]
+      },
+      "verdict": "reproduced",
+      "severity": "simplification",
+      "summary": "All 24,094 text-description answers are byte-identical to the value at the field their template declares — not merely equivalent, identical. §4.1 scores this type with \"an LLM-judged semantic score in [0,1] using GPT-4o as the evaluator\". On these labels that judge has nothing to do: the reference answer and the source field are the same string, so exact match measures the generator's fidelity to the retrieved evidence, which is what the metric is for, while the judge can only add sampling variance to a number that needs none."
+    },
+    "paper-counts-exceed-release": {
+      "measured": {
+        "release_scenario_keys": 472,
+        "release_horizon_blocks": 2910,
+        "release_ports": 45,
+        "release_storms": 69,
+        "paper_ports": 145,
+        "paper_storms": 90,
+        "paper_scenarios": 2917,
+        "questions": 117178,
+        "paper_questions": 117178
+      },
+      "verdict": "reproduced",
+      "severity": "format",
+      "summary": "§4.1 states '2,917 real-world disruption scenarios ... spanning 145 U.S. principal ports and 90 named storms'. The release has 472 storm-year-port scenario keys, 45 distinct ports and 69 distinct storms. The question count (117,178) and the horizon range (T-120..T-12) match exactly. Reading §4.1's 'scenario' as a (storm, port, year, horizon) quadruple reconciles the scenario number — `Encoded_senario.json` holds 2,910 horizon blocks — but not the port and storm counts."
+    }
+  }
+}

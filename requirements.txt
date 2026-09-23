@@ -1,0 +1,12 @@
+# Reproduction of arXiv:2604.12185 — OKH-RAG
+# Install:  pip install -r requirements.txt
+# Major versions pinned only; no upper bounds so the pins do not rot.
+
+torch>=2.0        # §3.1 Eq. 3-4 — low-rank bilinear transition model + contrastive training (autograd)
+numpy>=1.24       # scoring-term math and embedding matrices
+pyyaml>=6.0       # configs/base.yaml loading
+openai>=1.40      # §4.1 GPT-4o generator + §A.4 text-embedding-3-small
+
+# Optional, not required to run:
+# pytest>=8.0     # unit tests (tests/)
+# rapidfuzz>=3.0  # faster/better fuzzy relation-alias matching than stdlib difflib (§A.2)

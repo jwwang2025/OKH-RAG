@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Test / tooling
+.pytest_cache/
+.coverage
+.ruff_cache/
+
+# Reproduced-paper artifacts (regenerable, never commit)
+artifacts/
+.paper2code_work/
+*.log
+
+# A temporary clone of the upstream benchmark repo, used only to vendor data/raw/cyportqa/ and
+# third_party/cyportqa_official/. The clone itself is deleted once the vendoring is verified, so
+# nothing should normally be here; the rule exists to stop a fresh clone from being committed.
+# Re-clone with the command in data/CONTRACT.md §2.
+.cyportqa_upstream/
+
+# CyPortQA. MIT licensed, so redistributable in principle — but 233 MB, and reproducible in one
+# command from https://github.com/ChenchenMobility/MLLM-Bench-CyPortQA. See data/CONTRACT.md §2
+# for the exact commands. What IS tracked is the contract (data/CONTRACT.md) and the audit
+# (reports/cyportqa_audit.md), so the schema and the defects survive without the bytes.
+data/raw/
+data/processed/
+
+.workbuddy/

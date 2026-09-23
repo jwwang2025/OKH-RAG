@@ -1,0 +1,16 @@
+torch>=2.2
+transformers>=4.43
+datasets>=2.19
+tiktoken>=0.6
+langchain>=0.2
+langchain-core>=0.2
+langchain-community>=0.2
+pandas
+numpy
+tqdm
+matplotlib
+scikit-learn
+joblib
+Pillow
+openai
+google-generativeai
