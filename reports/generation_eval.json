@@ -72,7 +72,7 @@
       "n_questions": 200,
       "n_empty_context": 0,
       "n_nonconforming_answers": 0,
-      "elapsed_s": 53.95
+      "elapsed_s": 49.72
     },
     "hypergraph_rag": {
       "by_format": {
@@ -120,7 +120,7 @@
       "n_questions": 200,
       "n_empty_context": 0,
       "n_nonconforming_answers": 0,
-      "elapsed_s": 2.78
+      "elapsed_s": 3.35
     },
     "text_rag": {
       "by_format": {
@@ -168,7 +168,7 @@
       "n_questions": 200,
       "n_empty_context": 0,
       "n_nonconforming_answers": 0,
-      "elapsed_s": 0.68
+      "elapsed_s": 0.84
     },
     "graph_rag": {
       "by_format": {
@@ -216,7 +216,7 @@
       "n_questions": 200,
       "n_empty_context": 0,
       "n_nonconforming_answers": 0,
-      "elapsed_s": 3.14
+      "elapsed_s": 3.91
     }
   }
 }

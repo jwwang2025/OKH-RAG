@@ -2,7 +2,7 @@
   "config": "G:\\4_bitwork\\work1\\benchmark\\OKH-RAG\\configs\\base.yaml",
   "data": "G:\\4_bitwork\\work1\\benchmark\\OKH-RAG\\data\\raw\\cyportqa",
   "seed": 42,
-  "scenario_limit": 48,
+  "scenario_limit": 472,
   "template_coverage": {
     "total": 48,
     "resolved": 46,
@@ -59,1360 +59,264 @@
     "unmapped_templates": {}
   },
   "reference_graph": {
-    "scenarios": 48,
-    "horizon_blocks": 292,
-    "fields_seen": 13823,
-    "fields_kept": 13531,
-    "fields_empty_value": 114,
-    "fields_dropped_unmapped": 292,
+    "scenarios": 472,
+    "horizon_blocks": 2910,
+    "fields_seen": 138196,
+    "fields_kept": 135248,
+    "fields_empty_value": 900,
+    "fields_dropped_unmapped": 2948,
     "unmapped_paths": {
-      "cyclone_condition_and_forecast.name": 292
+      "cyclone_condition_and_forecast.name": 2910,
+      "cyclone_condition_and_forecast._comment": 2,
+      "cyclone_condition_and_forecast.// once inland Beta is not expected to re-emerge near Corpus Christi’s coastline": 1,
+      "cyclone_condition_and_forecast.-- storm never expected to pass offshore of New York Harbor in current forecast --": 1,
+      "cyclone_condition_and_forecast.port.name": 1,
+      "cyclone_condition_and_forecast.weather_observation.within_uncertainty_cone": 1,
+      "cyclone_condition_and_forecast.weather_observation.forecast_window": 1,
+      "cyclone_condition_and_forecast.weather_observation.under_watch": 1,
+      "cyclone_condition_and_forecast.weather_observation.under_warning": 1,
+      "cyclone_condition_and_forecast.weather_observation.watch_coast": 1,
+      "cyclone_condition_and_forecast.weather_observation.warning_coast": 1,
+      "cyclone_condition_and_forecast.weather_observation.impacted_coast": 1,
+      "cyclone_condition_and_forecast.weather_observation.expected_closest_date_to_port": 1,
+      "cyclone_condition_and_forecast.weather_observation.expected_leaving_port_date": 1,
+      "cyclone_condition_and_forecast.weather_observation.closest_wind_data_location": 1,
+      "cyclone_condition_and_forecast.weather_observation.culmulative_wind_34kt": 1,
+      "cyclone_condition_and_forecast.weather_observation.culmulative_wind_50kt": 1,
+      "cyclone_condition_and_forecast.weather_observation.34kt_max": 1,
+      "cyclone_condition_and_forecast.weather_observation.time_to_34kt_max": 1,
+      "cyclone_condition_and_forecast.weather_observation.time_to_34kt_non_zero": 1,
+      "cyclone_condition_and_forecast.weather_observation.time_to_50kt_max": 1,
+      "cyclone_condition_and_forecast.weather_observation.gale_probability.in 12h": 1,
+      "cyclone_condition_and_forecast.weather_observation.gale_probability.in 24h": 1,
+      "cyclone_condition_and_forecast.weather_observation.gale_probability.in 48h": 1,
+      "cyclone_condition_and_forecast.weather_observation.gale_probability.in 72h": 1,
+      "cyclone_condition_and_forecast.weather_observation.gale_probability.in 96h": 1,
+      "cyclone_condition_and_forecast.weather_observation.first_hazard": 1,
+      "cyclone_condition_and_forecast.weather_observation.rain_fall_above_4_inch": 1,
+      "cyclone_condition_and_forecast.weather_observation.storm_surge_above_3_feet": 1,
+      "cyclone_condition_and_forecast.weather_observation.wind": 1,
+      "cyclone_condition_and_forecast.weather_observation.storm_surge": 1,
+      "cyclone_condition_and_forecast.weather_observation.rainfall": 1,
+      "cyclone_condition_and_forecast.weather_observation.other_hazards": 1,
+      "cyclone_condition_and_forecast._comment2": 1,
+      "cyclone_condition_and_forecast. // centre expected to clear the Cape Canaveral latitude by late Sunday night/early Monday (≈ 48 h from advisory time) ": 1,
+      "weather_observation.*approx. Mon / Tue when the storm reaches 25°–27° N, still >400 mi from San Diego*” NOTE: if not valid, leave blank? Provide ISO format maybe ": 1,
+      "weather_observation.*No value shown for San Diego; Punta Eugenia only 3%*” keep ": 1,
+      "cyclone_condition_and_forecast._note": 1
     },
-    "coverage": 0.9789,
-    "anomalies": {},
-    "raw_hyperedges": 13531,
-    "hyperedges": 24840,
-    "entities": 13919,
+    "coverage": 0.9787,
+    "anomalies": {
+      "stray-key:_comment": 2,
+      "stray-key:// once inland Beta is not expected to re-emerge near Corpus Christi’s coastline": 1,
+      "stray-key:// after passage probability quickly drops; table shows no additional onset values beyond first 12 h": 1,
+      "displaced-block:cyclone_condition_and_forecast.weather_observation": 1,
+      "stray-key:-- storm never expected to pass offshore of New York Harbor in current forecast --": 1,
+      "stray-key:_comment2": 1,
+      "stray-key: // centre expected to clear the Cape Canaveral latitude by late Sunday night/early Monday (≈ 48 h from advisory time) ": 1,
+      "stray-key: Mon / Tue when the storm reaches 25°–27° N, still >400 mi from San Diego*” NOTE: if not valid, leave blank? Provide ISO format maybe ": 1,
+      "stray-key:*No value shown for San Diego; Punta Eugenia only 3%*” keep ": 1,
+      "stray-key:_note": 1
+    },
+    "raw_hyperedges": 135248,
+    "hyperedges": 248652,
+    "entities": 139102,
     "id_collisions": {
       "ids": 0,
       "groups": 0,
       "stale": 0
     },
     "hyperedges_by_relation": {
-      "forecast_updates_to": 8625,
-      "changes_probability_to": 2684,
-      "has_leadtime_probability": 2336,
-      "forecasts_landfall": 1460,
-      "forecasts_hazard_at_horizon": 1168,
-      "has_impact_prediction": 1168,
-      "has_hours_to_landfall": 876,
-      "has_cumulative_probability": 876,
-      "has_cyclone_state": 584,
-      "has_motion": 584,
-      "forecasts_track": 584,
-      "has_watch_status": 584,
-      "has_warning_status": 584,
-      "has_threshold_status": 584,
-      "causes_operational_disruption": 584,
-      "has_category_state": 292,
-      "has_forecast_window": 292,
-      "observes_hazard_at_horizon": 292,
-      "has_additional_hazard": 292,
-      "has_recovery_status": 292,
-      "affects_vessel_handling": 57,
-      "has_operation_status": 42
+      "forecast_updates_to": 86606,
+      "changes_probability_to": 26798,
+      "has_leadtime_probability": 23265,
+      "forecasts_landfall": 14547,
+      "has_impact_prediction": 11640,
+      "forecasts_hazard_at_horizon": 11632,
+      "has_hours_to_landfall": 8730,
+      "has_cumulative_probability": 8725,
+      "has_cyclone_state": 5820,
+      "has_motion": 5820,
+      "causes_operational_disruption": 5820,
+      "forecasts_track": 5819,
+      "has_watch_status": 5818,
+      "has_warning_status": 5818,
+      "has_threshold_status": 5816,
+      "has_category_state": 2910,
+      "has_recovery_status": 2910,
+      "has_forecast_window": 2909,
+      "observes_hazard_at_horizon": 2909,
+      "has_additional_hazard": 2908,
+      "affects_vessel_handling": 822,
+      "has_operation_status": 610
     }
   },
   "gold_inventory": {
-    "n_questions": 11711,
-    "n_scorable": 11127,
-    "scorable_rate": 0.9501,
+    "n_questions": 117178,
+    "n_scorable": 111358,
+    "scorable_rate": 0.9503,
     "statuses": {
-      "entity": 584,
-      "resolved": 11127
+      "entity": 5820,
+      "resolved": 111358
     },
     "gold_size_histogram_capped_at_5": {
-      "1": 1762,
-      "2": 3453,
-      "3": 2362,
-      "4": 1172,
-      "5": 2378
+      "1": 17595,
+      "2": 34507,
+      "3": 23688,
+      "4": 11722,
+      "5": 23846
     },
     "unscorable_reasons": {},
     "per_template": {
       "Q1": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q2": {
-        "resolved": 291
+        "resolved": 2873
       },
       "Q3": {
-        "resolved": 292
+        "resolved": 2902
       },
       "Q4": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q5": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q6": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q7": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q8": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q9": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q10": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q11": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q12": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q13": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q14": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q15": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q16": {
-        "entity": 292
+        "entity": 2910
       },
       "Q17": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q18": {
-        "resolved": 288
+        "resolved": 2851
       },
       "Q19": {
-        "entity": 292
+        "entity": 2910
       },
       "Q20": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q21": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q22": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q23": {
-        "resolved": 292
+        "resolved": 2909
       },
       "Q24": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q25": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q26": {
-        "resolved": 291
+        "resolved": 2904
       },
       "Q27": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q28": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q29": {
-        "resolved": 292
+        "resolved": 2896
       },
       "Q30": {
-        "resolved": 268
+        "resolved": 2749
       },
       "Q31": {
-        "resolved": 254
+        "resolved": 2567
       },
       "Q32": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q33": {
-        "resolved": 292
+        "resolved": 2908
       },
       "Q34": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q35": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q36": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q37": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q38": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q39": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q40": {
-        "resolved": 292
+        "resolved": 2910
       },
       "Q41": {
-        "resolved": 12
+        "resolved": 117
       },
       "Q42": {
-        "resolved": 30
+        "resolved": 493
       },
       "Q43": {
-        "resolved": 7
+        "resolved": 53
       },
       "Q44": {
-        "resolved": 7
+        "resolved": 53
       },
       "Q45": {
-        "resolved": 7
+        "resolved": 53
       },
       "Q46": {
-        "resolved": 12
+        "resolved": 221
       },
       "Q47": {
-        "resolved": 12
+        "resolved": 221
       },
       "Q48": {
-        "resolved": 12
+        "resolved": 221
       }
     },
     "provenance_mismatches": [],
     "n_provenance_mismatches": 0
   },
   "backend": "lexical",
-  "retrieval": {
-    "n_records": 120,
-    "configurations": {
-      "heuristic": {
-        "pool_recall": 0.5782,
-        "anchor_recall": 0.2231,
-        "trajectory_recall": 0.0319,
-        "all_trajectory_recall": 0.0442,
-        "trajectory_precision": 0.0109,
-        "chance_recall": 0.0308,
-        "trajectory_recall_over_chance": 1.036,
-        "first_gold_step_mean": 3.1,
-        "gold_fully_retrieved_rate": 0.0087,
-        "canonical_concordance_mean": 0.6783,
-        "canonical_concordance_n": 115,
-        "gold_order_concordance_mean": null,
-        "gold_order_concordance_n": 0,
-        "status_counts": {
-          "entity": 5,
-          "resolved": 115
-        },
-        "by_template": {
-          "Q1": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "forecasts_track",
-            "family": "track_landfall"
-          },
-          "Q2": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q3": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7143,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q4": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q5": {
-            "n": 9,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7222,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q6": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_cyclone_state",
-            "family": "cyclone_state"
-          },
-          "Q7": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q8": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q9": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q10": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "observes_hazard_at_horizon",
-            "family": "hazard_observation"
-          },
-          "Q11": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q12": {
-            "n": 3,
-            "trajectory_recall": 0.1111,
-            "pool_recall": 0.7778,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q13": {
-            "n": 3,
-            "trajectory_recall": 0.0417,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q14": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5417,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q15": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q17": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q20": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q21": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q22": {
-            "n": 2,
-            "trajectory_recall": 0.1667,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q23": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_forecast_window",
-            "family": "timing"
-          },
-          "Q24": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.1667,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q25": {
-            "n": 6,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.2083,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q26": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q27": {
-            "n": 5,
-            "trajectory_recall": 0.075,
-            "pool_recall": 0.825,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q28": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q29": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8125,
-            "gold_mean_size": 4.0,
-            "relation": "forecasts_hazard_at_horizon",
-            "family": "hazard_forecast"
-          },
-          "Q30": {
-            "n": 6,
-            "trajectory_recall": 0.25,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q31": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q32": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6,
-            "gold_mean_size": 1.0,
-            "relation": "has_additional_hazard",
-            "family": "additional_hazards"
-          },
-          "Q33": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q34": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q35": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.875,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q36": {
-            "n": 2,
-            "trajectory_recall": 0.5,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q37": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q38": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q40": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q47": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 6.0,
-            "relation": "affects_vessel_handling",
-            "family": "operations"
-          }
-        },
-        "by_horizon": {
-          "12": {
-            "n": 19,
-            "trajectory_recall": 0.0241,
-            "pool_recall": 0.7281,
-            "gold_mean_size": 2.789
-          },
-          "24": {
-            "n": 21,
-            "trajectory_recall": 0.0833,
-            "pool_recall": 0.6452,
-            "gold_mean_size": 3.714
-          },
-          "36": {
-            "n": 14,
-            "trajectory_recall": 0.0089,
-            "pool_recall": 0.5625,
-            "gold_mean_size": 4.214
-          },
-          "48": {
-            "n": 15,
-            "trajectory_recall": 0.0333,
-            "pool_recall": 0.4544,
-            "gold_mean_size": 3.333
-          },
-          "60": {
-            "n": 9,
-            "trajectory_recall": 0.0556,
-            "pool_recall": 0.463,
-            "gold_mean_size": 2.667
-          },
-          "72": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 3.571
-          },
-          "84": {
-            "n": 8,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5885,
-            "gold_mean_size": 3.625
-          },
-          "96": {
-            "n": 5,
-            "trajectory_recall": 0.0667,
-            "pool_recall": 0.7333,
-            "gold_mean_size": 2.8
-          },
-          "108": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4345,
-            "gold_mean_size": 3.857
-          },
-          "120": {
-            "n": 10,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6208,
-            "gold_mean_size": 3.2
-          }
-        },
-        "empty_gold_by_cause": {}
-      },
-      "no_order": {
-        "pool_recall": 0.5782,
-        "anchor_recall": 0.2231,
-        "trajectory_recall": 0.0312,
-        "all_trajectory_recall": 0.0312,
-        "trajectory_precision": 0.012,
-        "chance_recall": 0.0308,
-        "trajectory_recall_over_chance": 1.013,
-        "first_gold_step_mean": 3.375,
-        "gold_fully_retrieved_rate": 0.0087,
-        "canonical_concordance_mean": 0.541,
-        "canonical_concordance_n": 115,
-        "gold_order_concordance_mean": 0.3333,
-        "gold_order_concordance_n": 2,
-        "status_counts": {
-          "entity": 5,
-          "resolved": 115
-        },
-        "by_template": {
-          "Q1": {
-            "n": 2,
-            "trajectory_recall": 0.25,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "forecasts_track",
-            "family": "track_landfall"
-          },
-          "Q2": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q3": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7143,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q4": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q5": {
-            "n": 9,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7222,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q6": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_cyclone_state",
-            "family": "cyclone_state"
-          },
-          "Q7": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q8": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q9": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q10": {
-            "n": 3,
-            "trajectory_recall": 0.3333,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "observes_hazard_at_horizon",
-            "family": "hazard_observation"
-          },
-          "Q11": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q12": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7778,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q13": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q14": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5417,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q15": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q17": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q20": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q21": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q22": {
-            "n": 2,
-            "trajectory_recall": 0.1667,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q23": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_forecast_window",
-            "family": "timing"
-          },
-          "Q24": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.1667,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q25": {
-            "n": 6,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.2083,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q26": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q27": {
-            "n": 5,
-            "trajectory_recall": 0.15,
-            "pool_recall": 0.825,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q28": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q29": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8125,
-            "gold_mean_size": 4.0,
-            "relation": "forecasts_hazard_at_horizon",
-            "family": "hazard_forecast"
-          },
-          "Q30": {
-            "n": 6,
-            "trajectory_recall": 0.0833,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q31": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q32": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6,
-            "gold_mean_size": 1.0,
-            "relation": "has_additional_hazard",
-            "family": "additional_hazards"
-          },
-          "Q33": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q34": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q35": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.875,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q36": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q37": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q38": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q40": {
-            "n": 3,
-            "trajectory_recall": 0.1667,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q47": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 6.0,
-            "relation": "affects_vessel_handling",
-            "family": "operations"
-          }
-        },
-        "by_horizon": {
-          "12": {
-            "n": 19,
-            "trajectory_recall": 0.0658,
-            "pool_recall": 0.7281,
-            "gold_mean_size": 2.789
-          },
-          "24": {
-            "n": 21,
-            "trajectory_recall": 0.0476,
-            "pool_recall": 0.6452,
-            "gold_mean_size": 3.714
-          },
-          "36": {
-            "n": 14,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5625,
-            "gold_mean_size": 4.214
-          },
-          "48": {
-            "n": 15,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4544,
-            "gold_mean_size": 3.333
-          },
-          "60": {
-            "n": 9,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.463,
-            "gold_mean_size": 2.667
-          },
-          "72": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 3.571
-          },
-          "84": {
-            "n": 8,
-            "trajectory_recall": 0.125,
-            "pool_recall": 0.5885,
-            "gold_mean_size": 3.625
-          },
-          "96": {
-            "n": 5,
-            "trajectory_recall": 0.0667,
-            "pool_recall": 0.7333,
-            "gold_mean_size": 2.8
-          },
-          "108": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4345,
-            "gold_mean_size": 3.857
-          },
-          "120": {
-            "n": 10,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6208,
-            "gold_mean_size": 3.2
-          }
-        },
-        "empty_gold_by_cause": {}
-      },
-      "heuristic_shuffled": {
-        "pool_recall": 0.5782,
-        "anchor_recall": 0.2231,
-        "trajectory_recall": 0.0319,
-        "all_trajectory_recall": 0.0442,
-        "trajectory_precision": 0.0109,
-        "chance_recall": 0.0308,
-        "trajectory_recall_over_chance": 1.036,
-        "first_gold_step_mean": 5.7,
-        "gold_fully_retrieved_rate": 0.0087,
-        "canonical_concordance_mean": 0.4379,
-        "canonical_concordance_n": 115,
-        "gold_order_concordance_mean": null,
-        "gold_order_concordance_n": 0,
-        "status_counts": {
-          "entity": 5,
-          "resolved": 115
-        },
-        "by_template": {
-          "Q1": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "forecasts_track",
-            "family": "track_landfall"
-          },
-          "Q2": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q3": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7143,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q4": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 2.0,
-            "relation": "has_watch_status",
-            "family": "advisory"
-          },
-          "Q5": {
-            "n": 9,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.7222,
-            "gold_mean_size": 2.0,
-            "relation": "has_warning_status",
-            "family": "advisory"
-          },
-          "Q6": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_cyclone_state",
-            "family": "cyclone_state"
-          },
-          "Q7": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q8": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_motion",
-            "family": "cyclone_state"
-          },
-          "Q9": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q10": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "observes_hazard_at_horizon",
-            "family": "hazard_observation"
-          },
-          "Q11": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q12": {
-            "n": 3,
-            "trajectory_recall": 0.1111,
-            "pool_recall": 0.7778,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q13": {
-            "n": 3,
-            "trajectory_recall": 0.0417,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q14": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5417,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q15": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q17": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q20": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 5.0,
-            "relation": "forecasts_landfall",
-            "family": "track_landfall"
-          },
-          "Q21": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q22": {
-            "n": 2,
-            "trajectory_recall": 0.1667,
-            "pool_recall": 0.8333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q23": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_forecast_window",
-            "family": "timing"
-          },
-          "Q24": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.1667,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q25": {
-            "n": 6,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.2083,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q26": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 3.0,
-            "relation": "has_cumulative_probability",
-            "family": "probability"
-          },
-          "Q27": {
-            "n": 5,
-            "trajectory_recall": 0.075,
-            "pool_recall": 0.825,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q28": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 3.0,
-            "relation": "has_hours_to_landfall",
-            "family": "timing"
-          },
-          "Q29": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.8125,
-            "gold_mean_size": 4.0,
-            "relation": "forecasts_hazard_at_horizon",
-            "family": "hazard_forecast"
-          },
-          "Q30": {
-            "n": 6,
-            "trajectory_recall": 0.25,
-            "pool_recall": 0.5,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q31": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 2.0,
-            "relation": "has_threshold_status",
-            "family": "threshold"
-          },
-          "Q32": {
-            "n": 5,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6,
-            "gold_mean_size": 1.0,
-            "relation": "has_additional_hazard",
-            "family": "additional_hazards"
-          },
-          "Q33": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 8.0,
-            "relation": "has_leadtime_probability",
-            "family": "probability"
-          },
-          "Q34": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.75,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q35": {
-            "n": 2,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.875,
-            "gold_mean_size": 4.0,
-            "relation": "has_impact_prediction",
-            "family": "impact"
-          },
-          "Q36": {
-            "n": 2,
-            "trajectory_recall": 0.5,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q37": {
-            "n": 4,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.0,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q38": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 1.0,
-            "gold_mean_size": 1.0,
-            "relation": "has_recovery_status",
-            "family": "recovery"
-          },
-          "Q40": {
-            "n": 3,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6667,
-            "gold_mean_size": 2.0,
-            "relation": "causes_operational_disruption",
-            "family": "impact"
-          },
-          "Q47": {
-            "n": 1,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.3333,
-            "gold_mean_size": 6.0,
-            "relation": "affects_vessel_handling",
-            "family": "operations"
-          }
-        },
-        "by_horizon": {
-          "12": {
-            "n": 19,
-            "trajectory_recall": 0.0241,
-            "pool_recall": 0.7281,
-            "gold_mean_size": 2.789
-          },
-          "24": {
-            "n": 21,
-            "trajectory_recall": 0.0833,
-            "pool_recall": 0.6452,
-            "gold_mean_size": 3.714
-          },
-          "36": {
-            "n": 14,
-            "trajectory_recall": 0.0089,
-            "pool_recall": 0.5625,
-            "gold_mean_size": 4.214
-          },
-          "48": {
-            "n": 15,
-            "trajectory_recall": 0.0333,
-            "pool_recall": 0.4544,
-            "gold_mean_size": 3.333
-          },
-          "60": {
-            "n": 9,
-            "trajectory_recall": 0.0556,
-            "pool_recall": 0.463,
-            "gold_mean_size": 2.667
-          },
-          "72": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.375,
-            "gold_mean_size": 3.571
-          },
-          "84": {
-            "n": 8,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.5885,
-            "gold_mean_size": 3.625
-          },
-          "96": {
-            "n": 5,
-            "trajectory_recall": 0.0667,
-            "pool_recall": 0.7333,
-            "gold_mean_size": 2.8
-          },
-          "108": {
-            "n": 7,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.4345,
-            "gold_mean_size": 3.857
-          },
-          "120": {
-            "n": 10,
-            "trajectory_recall": 0.0,
-            "pool_recall": 0.6208,
-            "gold_mean_size": 3.2
-          }
-        },
-        "empty_gold_by_cause": {}
-      }
-    }
-  },
-  "generated_at": "2026-09-23T17:04:37"
+  "retrieval": null,
+  "generated_at": "2026-09-23T19:55:14"
 }

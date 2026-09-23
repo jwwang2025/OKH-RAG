@@ -536,7 +536,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.backend == "openai":
             from okh_rag.llm.openai_client import OpenAIBackend
 
-            backend: EmbeddingClient = OpenAIBackend(cfg=cfg)
+            # OpenAIBackend reads embedding_model / batch / retry settings off the llm section;
+            # passing the root Config crashes on the first embed call with an AttributeError.
+            backend: EmbeddingClient = OpenAIBackend(cfg.llm)
         else:
             backend = LexicalEmbedder(dim=cfg.order_model.embedding_dim)
 
