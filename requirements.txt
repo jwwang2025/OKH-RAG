@@ -6,6 +6,7 @@ torch>=2.0        # §3.1 Eq. 3-4 — low-rank bilinear transition model + contr
 numpy>=1.24       # scoring-term math and embedding matrices
 pyyaml>=6.0       # configs/base.yaml loading
 openai>=1.40      # §4.1 GPT-4o generator + §A.4 text-embedding-3-small
+python-dotenv>=1.0  # auto-load OPENAI_API_KEY / OPENAI_BASE_URL from a repo-root .env
 
 # Optional, not required to run:
 # pytest>=8.0     # unit tests (tests/)

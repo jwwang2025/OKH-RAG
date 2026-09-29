@@ -5,7 +5,9 @@ GPT-4o for extraction too. This module is the only place that talks to the API.
 
 Configuration follows the SDK's own conventions: ``OPENAI_API_KEY`` and (optionally) ``OPENAI_BASE_URL``
 are read from the environment by the ``openai`` package itself, so no credential ever passes through
-``configs/base.yaml``.
+``configs/base.yaml``. A repo-root ``.env`` file is loaded automatically when ``python-dotenv`` is
+available, so writing the two variables there is enough — exporting them in the shell still takes
+precedence and overrides ``.env``.
 """
 
 from __future__ import annotations
@@ -16,6 +18,15 @@ import time
 from typing import Any, Mapping, Sequence
 
 import numpy as np
+
+# Populate os.environ from a repo-root .env (if present and python-dotenv is installed). Real
+# environment variables win: load_dotenv defaults to override=False.
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - dotenv is optional; plain env vars always work
+    pass
+else:
+    load_dotenv()
 
 from okh_rag.config import LLMConfig
 from okh_rag.llm.base import Usage
