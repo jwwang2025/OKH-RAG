@@ -42,7 +42,7 @@ from okh_rag.config import (
     load_config,
 )
 from okh_rag.embeddings import HyperedgeEmbeddings
-from okh_rag.precedence import PrecedenceGraph
+from okh_rag.ordering.precedence import PrecedenceGraph
 from okh_rag.retrieval import (
     CandidateScores,
     HypergraphIndex,

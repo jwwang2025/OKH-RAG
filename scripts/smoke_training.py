@@ -26,10 +26,10 @@ from okh_rag.config import Config, load_config  # noqa: E402
 from okh_rag.embeddings import EmbeddingStore, embed_hypergraph, hyperedge_embedding_text  # noqa: E402
 from okh_rag.extraction import ScenarioDocument, extract_hypergraph_from_document, split_horizons  # noqa: E402
 from okh_rag.llm.base import Usage  # noqa: E402
-from okh_rag.order_model import PAPER_PARAMETER_COUNT, LearnedTransitionModel  # noqa: E402
-from okh_rag.precedence import build_precedence, canonical_order  # noqa: E402
+from okh_rag.ordering.model import PAPER_PARAMETER_COUNT, LearnedTransitionModel  # noqa: E402
+from okh_rag.ordering.precedence import build_precedence, canonical_order  # noqa: E402
 from okh_rag.schema import KnowledgeHypergraph  # noqa: E402
-from okh_rag.training import (  # noqa: E402
+from okh_rag.ordering import (  # noqa: E402
     SIGNAL_DOCUMENT_ORDER,
     NegativeSampler,
     build_training_pairs,

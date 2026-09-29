@@ -65,7 +65,7 @@ from okh_rag.generation.output import (
 )
 from okh_rag.generation.prompts import build_messages, output_contract
 from okh_rag.llm.openai_client import _assert_strict_schema
-from okh_rag.precedence import build_precedence
+from okh_rag.ordering.precedence import build_precedence
 from okh_rag.retrieval import OrderAwareRetriever
 from okh_rag.schema import Hyperedge, KnowledgeHypergraph
 from okh_rag.vocabulary import is_cross_horizon

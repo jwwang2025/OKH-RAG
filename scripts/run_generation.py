@@ -71,7 +71,7 @@ from okh_rag.generation.baselines import (  # noqa: E402
 )
 from okh_rag.generation.evidence import context_from_retrieval  # noqa: E402
 from okh_rag.generation.generator import Generator  # noqa: E402
-from okh_rag.precedence import build_precedence  # noqa: E402
+from okh_rag.ordering.precedence import build_precedence  # noqa: E402
 from okh_rag.retrieval import OrderAwareRetriever  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -208,10 +208,10 @@ def load_order_model(cfg: Config, path: str | None) -> object | None:
     if not candidate.is_file():
         raise SystemExit(
             f"transition_variant='learned' needs a trained P_theta, and no checkpoint exists at {candidate}.\n"
-            "Either train one first (see src/okh_rag/training/train.py), or pass "
+            "Either train one first (see scripts/train_order_model.py), or pass "
             "--transition-variant heuristic for an offline wiring check."
         )
-    from okh_rag.order_model import LearnedTransitionModel
+    from okh_rag.ordering.model import LearnedTransitionModel
 
     model = LearnedTransitionModel.load(candidate, cfg=cfg.order_model)
     print(f"Order model: loaded {candidate}")

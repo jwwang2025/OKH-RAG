@@ -61,7 +61,7 @@ from okh_rag.config import (
     RetrievalWeights,
 )
 from okh_rag.embeddings import HyperedgeEmbeddings
-from okh_rag.precedence import PrecedenceGraph
+from okh_rag.ordering.precedence import PrecedenceGraph
 from okh_rag.schema import Hyperedge, KnowledgeHypergraph, TrajectoryScore
 from okh_rag.vocabulary import coverage_phase_of, coverage_phase_reachable
 

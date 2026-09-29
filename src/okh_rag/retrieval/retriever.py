@@ -43,7 +43,7 @@ import numpy as np
 from okh_rag.config import INFERENCE_MODES, Config, RetrievalWeights
 from okh_rag.embeddings import EmbeddingStore, HyperedgeEmbeddings, embed_texts
 from okh_rag.llm.base import EmbeddingClient
-from okh_rag.precedence import PrecedenceGraph
+from okh_rag.ordering.precedence import PrecedenceGraph
 from okh_rag.retrieval.beam import BeamSearchResult, order_aware_beam_search
 from okh_rag.retrieval.candidates import CandidatePool, HypergraphIndex, scope_candidates
 from okh_rag.retrieval.scoring import (

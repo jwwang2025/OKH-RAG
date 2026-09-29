@@ -68,7 +68,7 @@ from okh_rag.evaluation.oracle import (  # noqa: E402
 )
 from okh_rag.evaluation.reference_graph import build_reference_graph  # noqa: E402
 from okh_rag.llm.base import EmbeddingClient  # noqa: E402
-from okh_rag.precedence import build_precedence, canonical_order, trajectory_order_index  # noqa: E402
+from okh_rag.ordering.precedence import build_precedence, canonical_order, trajectory_order_index  # noqa: E402
 from okh_rag.retrieval import OrderAwareRetriever  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

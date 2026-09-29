@@ -37,10 +37,10 @@ import torch
 
 from okh_rag.config import Config, TrainingConfig
 from okh_rag.embeddings import HyperedgeEmbeddings
-from okh_rag.order_model import LearnedTransitionModel
+from okh_rag.ordering.model import LearnedTransitionModel
 from okh_rag.schema import KnowledgeHypergraph
 from okh_rag.seeding import derive_seed, set_global_seed
-from okh_rag.training.pairs import (
+from okh_rag.ordering.pairs import (
     SIGNAL_RETRIEVAL_INDUCED,
     NegativeSampler,
     OrderedPair,

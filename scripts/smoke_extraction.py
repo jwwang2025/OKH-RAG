@@ -24,7 +24,7 @@ from okh_rag.extraction import (  # noqa: E402
 )
 from okh_rag.extraction.horizon import HorizonBlock, split_horizons  # noqa: E402
 from okh_rag.llm.base import Usage  # noqa: E402
-from okh_rag.precedence import build_precedence, canonical_order, phase_sequence  # noqa: E402
+from okh_rag.ordering.precedence import build_precedence, canonical_order, phase_sequence  # noqa: E402
 from okh_rag.schema import EntityCategory  # noqa: E402
 
 DOC = """Scenario ARTHUR / Baltimore, MD

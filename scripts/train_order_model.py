@@ -53,8 +53,8 @@ from okh_rag.data.cyportqa import load_corpus  # noqa: E402
 from okh_rag.embeddings import EmbeddingStore, embed_hypergraph  # noqa: E402
 from okh_rag.evaluation.reference_graph import build_reference_graph  # noqa: E402
 from okh_rag.llm.openai_client import OpenAIBackend  # noqa: E402
-from okh_rag.precedence import build_precedence, canonical_order  # noqa: E402
-from okh_rag.training.train import summarise_report, train_order_model  # noqa: E402
+from okh_rag.ordering.precedence import build_precedence, canonical_order  # noqa: E402
+from okh_rag.ordering.train import summarise_report, train_order_model  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CHECKPOINT = REPO_ROOT / "artifacts" / "order_model.pt"
