@@ -28,7 +28,7 @@ The five things this driver exists to keep honest:
 Usage::
 
     # wiring check, no API key, no real accuracy
-    python scripts/run_generation.py --sources okh_rag hypergraph_rag --retrieve 40
+    python scripts/run_generation.py --retrieve 40
 
     # §4.1 as written (needs OPENAI_API_KEY)
     python scripts/run_generation.py --backend openai --mode single_call
@@ -61,22 +61,12 @@ from okh_rag.embeddings import (  # noqa: E402
 )
 from okh_rag.evaluation.answers import AccuracyReport, score_record  # noqa: E402
 from okh_rag.evaluation.reference_graph import build_reference_graph  # noqa: E402
-from okh_rag.generation.baselines import (  # noqa: E402
-    BASELINE_SOURCES,
-    ChunkIndex,
-    GraphRagRetriever,
-    HypergraphRagRetriever,
-    TextRagRetriever,
-    load_raw_text_chunks,
-)
 from okh_rag.generation.evidence import context_from_retrieval  # noqa: E402
 from okh_rag.generation.generator import Generator  # noqa: E402
 from okh_rag.ordering.precedence import build_precedence  # noqa: E402
 from okh_rag.retrieval import OrderAwareRetriever  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ALL_SOURCES = ("okh_rag",) + BASELINE_SOURCES
-DEFAULT_SOURCES = ("okh_rag", "text_rag", "graph_rag", "hypergraph_rag")
 
 
 # ---------------------------------------------------------------------------
@@ -229,7 +219,6 @@ class RunPlan:
 
     backend: str
     mode: str
-    sources: tuple[str, ...]
     shuffle: bool
     scenario_limit: int | None
     question_limit: int | None
@@ -239,7 +228,6 @@ class RunPlan:
         return {
             "backend": self.backend,
             "answer_mode": self.mode,
-            "sources": list(self.sources),
             "shuffle_trajectory": self.shuffle,
             "scenario_limit": self.scenario_limit,
             "question_limit": self.question_limit,
@@ -276,18 +264,11 @@ def build_embeddings(graph, cfg: Config, embedder) -> HyperedgeEmbeddings:
 
 
 def build_retrievers(
-    graph, embeddings, cfg: Config, embedder, *, sources, order_model: object | None = None
+    graph, embeddings, cfg: Config, embedder, *, order_model: object | None = None
 ) -> dict[str, Any]:
-    """Construct each requested retriever, sharing the corpus embeddings.
-
-    §4.1 fixes "the same embedding model" across methods, so the hypergraph-side retrievers all receive the
-    one :class:`HyperedgeEmbeddings`. Text-RAG needs its own vectors because its corpus is different — the
-    NOAA text tree rather than the hypergraph — but the same embedder produces them.
-    """
-    retrievers: dict[str, Any] = {}
-
-    if "okh_rag" in sources:
-        retrievers["okh_rag"] = OrderAwareRetriever(
+    """Construct the OKH-RAG retriever."""
+    return {
+        "okh_rag": OrderAwareRetriever(
             cfg=cfg,
             hypergraph=graph.hypergraph,
             precedence=build_precedence(graph.hypergraph, cfg.precedence),
@@ -295,25 +276,7 @@ def build_retrievers(
             order_model=order_model,
             backend=None,
         )
-    if "hypergraph_rag" in sources:
-        retrievers["hypergraph_rag"] = HypergraphRagRetriever(
-            graph.hypergraph, embeddings, cfg.retrieval, cfg.baselines
-        )
-    if "graph_rag" in sources:
-        retrievers["graph_rag"] = GraphRagRetriever(
-            graph.hypergraph, embeddings, cfg.retrieval, cfg.baselines
-        )
-    if "text_rag" in sources:
-        chunks = load_raw_text_chunks(REPO_ROOT / "data" / "raw" / "cyportqa")
-        print(f"  text_rag corpus: {len(chunks)} chunks")
-        if chunks:
-            matrix = embed_texts(
-                [chunk.text for chunk in chunks], backend=embedder, cfg=cfg, store=None
-            )
-            retrievers["text_rag"] = TextRagRetriever(ChunkIndex(chunks, matrix), cfg.baselines)
-        else:
-            print("  text_rag: no NOAA text tree vendored; the method will be skipped")
-    return retrievers
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -538,13 +501,6 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         choices=("lexical", "openai"),
         help="lexical = offline wiring check (the default); openai = §4.1's models",
     )
-    parser.add_argument(
-        "--sources",
-        nargs="+",
-        default=list(DEFAULT_SOURCES),
-        choices=list(ALL_SOURCES),
-        help="which methods to run",
-    )
     parser.add_argument("--mode", default=None, choices=("single_call", "per_trajectory"))
     parser.add_argument(
         "--transition-variant",
@@ -596,7 +552,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     plan = RunPlan(
         backend=args.backend,
         mode=args.mode or cfg.generation.mode,
-        sources=tuple(args.sources),
         shuffle=args.shuffle,
         scenario_limit=args.scenario_limit,
         question_limit=args.retrieve or None,
@@ -626,7 +581,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     print("Building retrievers...")
     retrievers = build_retrievers(
-        graph, embeddings, cfg, embedder, sources=plan.sources, order_model=order_model
+        graph, embeddings, cfg, embedder, order_model=order_model
     )
 
     print("Embedding queries...")
@@ -641,27 +596,24 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     generator = Generator(generator_backend, cfg)
     results: dict[str, SourceResult] = {}
-    for source in plan.sources:
-        if source not in retrievers:
-            print(f"-- {source}: skipped (not constructed) --")
-            continue
-        print(f"-- {source} --")
-        results[source] = run_source(
-            source=source,
-            retriever=retrievers[source],
-            records=records,
-            query_vectors=query_vectors,
-            graph=graph,
-            generator=generator,
-            cfg=cfg,
-            plan=plan,
-        )
-        summary = results[source]
-        print(
-            f"   {summary.n_questions} questions in {summary.elapsed_s:.1f}s; "
-            f"overall={_pct(summary.report.overall(cfg.evaluation.overall))}; "
-            f"empty={summary.n_empty_context}; nonconforming={summary.n_nonconforming}"
-        )
+    source = "okh_rag"
+    print(f"-- {source} --")
+    results[source] = run_source(
+        source=source,
+        retriever=retrievers[source],
+        records=records,
+        query_vectors=query_vectors,
+        graph=graph,
+        generator=generator,
+        cfg=cfg,
+        plan=plan,
+    )
+    summary = results[source]
+    print(
+        f"   {summary.n_questions} questions in {summary.elapsed_s:.1f}s; "
+        f"overall={_pct(summary.report.overall(cfg.evaluation.overall))}; "
+        f"empty={summary.n_empty_context}; nonconforming={summary.n_nonconforming}"
+    )
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
