@@ -8,8 +8,14 @@ repository root without an editable install.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
+
+# Windows + Anaconda: pip-installed torch and MKL-backed numpy each ship their own
+# libiomp5md.dll; loading both in one process aborts with "OMP: Error #15".
+# Must be set before numpy/torch initialize their OpenMP runtime.
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 SRC = Path(__file__).resolve().parent / "src"
 if str(SRC) not in sys.path:

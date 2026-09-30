@@ -8,10 +8,9 @@
 |---|---|
 | `backend` | lexical |
 | `answer_mode` | single_call |
-| `sources` | okh_rag, hypergraph_rag, text_rag, graph_rag |
 | `shuffle_trajectory` | False |
-| `scenario_limit` | 8 |
-| `question_limit` | 200 |
+| `scenario_limit` | 24 |
+| `question_limit` | 20 |
 | `seed` | 42 |
 | `generator_model` | `gpt-4o` |
 | `td_scoring` | `exact_match` |
@@ -21,28 +20,19 @@
 
 | method | TF | MC | SA (NU) | TD (DE) | overall (micro) | overall (macro) |
 |---|---|---|---|---|---|---|
-| `okh_rag` | 75.0% | 31.7% | 4.1% | 0.0% | 17.4% | 27.7% |
-| `hypergraph_rag` | 75.0% | 31.7% | 4.1% | 0.0% | 17.4% | 27.7% |
-| `text_rag` | 75.0% | 31.7% | 4.1% | 0.0% | 17.4% | 27.7% |
-| `graph_rag` | 75.0% | 31.7% | 4.1% | 0.0% | 17.4% | 27.7% |
+| `okh_rag` | 100.0% | 50.0% | — | 0.0% | 42.1% | 50.0% |
 
 ## Denominators and exclusions
 
 | method | questions | scorable | unanswerable | SA gold not numeric | empty context | non-conforming |
 |---|---|---|---|---|---|---|
-| `okh_rag` | 200 | 172 | 2 | 26 | 0 | 0 |
-| `hypergraph_rag` | 200 | 172 | 2 | 26 | 0 | 0 |
-| `text_rag` | 200 | 172 | 2 | 26 | 0 | 0 |
-| `graph_rag` | 200 | 172 | 2 | 26 | 0 | 0 |
+| `okh_rag` | 20 | 19 | 1 | 0 | 0 | 0 |
 
 ## Per-format denominators
 
-| method | DE (scorable/total) | MC (scorable/total) | NU (scorable/total) | TF (scorable/total) |
-|---|---|---|---|---|
-| `okh_rag` | 51/52 | 60/60 | 49/76 | 12/12 |
-| `hypergraph_rag` | 51/52 | 60/60 | 49/76 | 12/12 |
-| `text_rag` | 51/52 | 60/60 | 49/76 | 12/12 |
-| `graph_rag` | 51/52 | 60/60 | 49/76 | 12/12 |
+| method | DE (scorable/total) | MC (scorable/total) | TF (scorable/total) |
+|---|---|---|---|
+| `okh_rag` | 7/8 | 8/8 | 4/4 |
 
 ## How to read this
 

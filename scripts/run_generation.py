@@ -41,9 +41,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 import sys
 import time
+
+# Windows + Anaconda: pip-installed torch and MKL-backed numpy each ship their own
+# libiomp5md.dll; loading both in one process aborts with "OMP: Error #15".
+# Must be set before numpy/torch initialize their OpenMP runtime.
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
