@@ -29,7 +29,9 @@ paths:
 # LLM / embedding backends
 # ---------------------------------------------------------------------------
 llm:
-  generator_model: "gpt-4o"                    # §4.1 — "the same generator (GPT-4o)"
+  generator_model: "gpt-4o-mini"               # §4.1 says "the same generator (GPT-4o)";
+                                               # [DEVIATION] implementation uses gpt-4o-mini for
+                                               # generation (§4.1) and extraction (§A.2) to cut cost.
   embedding_model: "text-embedding-3-small"    # §A.4 — "embedded as he ∈ R^1536 via OpenAI text-embedding-3-small"
   embedding_batch_size: 256                    # [UNSPECIFIED] — API batching size. Alternatives: 64, 512, 2048 (API limit).
   extraction_temperature: 0.0                  # [UNSPECIFIED] — temperature for p_ext. Alternatives: 0.2, 1.0.
@@ -300,7 +302,8 @@ generation:
 # §4.1 — evaluation
 # ---------------------------------------------------------------------------
 evaluation:
-  judge_model: "gpt-4o"           # §4.1 — "an LLM-judged semantic score in [0, 1] using GPT-4o as the evaluator"
+  judge_model: "gpt-4o-mini"      # §4.1 — "an LLM-judged semantic score in [0, 1] using GPT-4o as the evaluator"
+                                  # [DEVIATION] implementation uses gpt-4o-mini when td_scoring: "llm_judge".
   # [SIMPLIFICATION] §4.1's judge is not needed on this release. All 24,094 text-description
   # answers are byte-identical to the field their template declares, so normalised exact match
   # already scores them perfectly and the judge can only add sampling variance. TD is therefore
