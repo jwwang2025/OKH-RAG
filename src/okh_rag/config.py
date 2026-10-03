@@ -46,6 +46,24 @@ that is satisfied before the expansion spends the rest; ``"quota"`` reads the 15
 reserve, leaving 90 for the general pool. Default ``"floor"``, the reading under which the expansion stage
 is not left with 10 slots. See :mod:`okh_rag.retrieval.candidates`."""
 
+HORIZON_SCOPING_MODES: tuple[str, ...] = ("off", "own_block", "own_block_plus_cross")
+"""What a question's candidate universe ``C`` is drawn from, once its horizon block is known.
+
+CyPortQA asks the *same question text* once per horizon block of a scenario (``T-12``, ``T-24``,
+``T-36``, ``T-48`` ...). The gold answer is a function of the block — ``{senario.time.<key>.…}`` —
+and ``gold_for_record`` therefore resolves evidence at ``record.context.horizon_hours``. Retrieval
+that is scoped only to the *scenario* cannot tell the blocks apart: the query embedding is
+byte-identical, so every block receives the same trajectory and at most one of them can be right.
+
+* ``"off"`` — the whole group is searchable (pre-fix behaviour; the pool mixes all blocks).
+* ``"own_block"`` — ``C`` is drawn from the question's own block only.
+* ``"own_block_plus_cross"`` — the own block plus the cross-horizon change edges, which carry
+  ``horizon_hours is None`` and so belong to no block (§A.2 step 4).
+
+Default ``"own_block"``: it is the universe the gold definition already assumes, and the measured
+gold-hyperedge recall on the §4.1 sample is 0.083 → 0.507 against ``"off"``
+(``reports/sa_horizon_diagnosis.json``). See :mod:`okh_rag.retrieval.retriever`."""
+
 TRANSITION_VARIANTS: tuple[str, ...] = ("learned", "heuristic", "none")
 """Table 2's *Transition* group. ``"learned"`` is §3.1 Eq. 3, ``"heuristic"`` is §A.3's rules only, and
 ``"none"`` collapses the objective to relevance — §3.2's "setting all to zero recovers standard top-k
@@ -234,6 +252,7 @@ class RetrievalConfig:
     precedence_mode: str
     overlap_mode: str
     group_reserve_mode: str
+    horizon_scoping: str
     top_k: int
     candidate_pool_size: int
     group_reserve_fraction: float
@@ -467,6 +486,9 @@ def _validate(cfg: Config) -> None:
 
     if cfg.retrieval.group_reserve_mode not in GROUP_RESERVE_MODES:
         raise ValueError(f"retrieval.group_reserve_mode must be one of {GROUP_RESERVE_MODES}")
+
+    if cfg.retrieval.horizon_scoping not in HORIZON_SCOPING_MODES:
+        raise ValueError(f"retrieval.horizon_scoping must be one of {HORIZON_SCOPING_MODES}")
 
     if not (0.0 <= cfg.retrieval.group_reserve_fraction <= 1.0):
         raise ValueError(

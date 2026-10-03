@@ -249,6 +249,18 @@ retrieval:
   #   "quota" → the 150 slots contain the reserve: 90 general + 60
   group_reserve_mode: "floor"
 
+  # [UNSPECIFIED] §A.7 scopes C by *group* ("40% of slots reserved for the query's own group when known")
+  # and never mentions the horizon block. CyPortQA asks the same question text once per block (T-12,
+  # T-24, T-36, T-48 ...) with a block-dependent gold, so a group-scoped pool mixes every block and —
+  # the query text being byte-identical — returns the same trajectory for all of them; at most one of
+  # the N can be right. gold_for_record already resolves evidence at the record's own horizon, so the
+  # retriever has to use the same universe or the two halves of the pipeline disagree.
+  #   "off"                  → the whole group is searchable (pre-fix behaviour)
+  #   "own_block"            → C is drawn from the question's own horizon block            (default)
+  #   "own_block_plus_cross" → own block + the cross-horizon change edges (horizon_hours is None)
+  # Measured gold-hyperedge recall on the §4.1 sample: 0.083 (off) → 0.507 (own_block).
+  horizon_scoping: "own_block"
+
   top_k: 80                       # §A.7 — "top-K (K=80) cosine retrieval from the global index"
   candidate_pool_size: 150        # §A.7 — "The pool is capped at |C| = 150"
   group_reserve_fraction: 0.40    # §A.7 — "40% of slots reserved for the query's own group when known"

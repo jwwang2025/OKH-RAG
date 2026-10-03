@@ -646,19 +646,52 @@ the §4.5 shuffle ablation.
 The scoring side of §5.4 is validated by a third command:
 
 ```bash
-D:/Anaconda/python.exe scripts/run_generation.py \
-  --sources okh_rag hypergraph_rag text_rag graph_rag \
-  --transition-variant heuristic --scenario-limit 8 --retrieve 200
+D:/Anaconda/python.exe scripts/run_generation.py --transition-variant heuristic --retrieve 200
 ```
 
-This runs all four §4.1 methods over one question set with one generator, writing
-`reports/generation_eval.md` + `.json`. `--backend lexical` (the default) substitutes a
-token-overlap embedder and a stub generator that never reads the evidence, so **the accuracies it
-prints are not §4.1's** — the run checks the wiring, and the report says so in its first line.
-Expected from it: four identical accuracy rows (the stub cannot distinguish the methods), 0
-non-conforming answers, and a denominators table whose SA row shows roughly 60% scorable. Replace
-`--backend lexical` with `--backend openai` and drop `--transition-variant heuristic` once a
-trained `P_θ` exists to get §4.1's table; add `--shuffle` for §4.5 Table 2's Shuffle row.
+This runs OKH-RAG over one question set with one generator, writing `reports/generation_eval.md` +
+`.json`. `--backend lexical` (the default) substitutes a token-overlap embedder and a stub generator
+that never reads the evidence, so **the accuracies it prints are not §4.1's** — the run checks the
+wiring, and the report says so in its first line. Expected from it: 0 non-conforming answers and a
+denominators table whose SA row shows roughly 60% scorable. (`--sources` accepted three further
+methods until `fabe893` removed the baselines; only `okh_rag` remains, so Table 1's Text-RAG 0.287 /
+GraphRAG 0.414 / HyperGraphRAG 0.511 rows cannot be produced.) Replace `--backend lexical` with
+`--backend openai` and drop `--transition-variant heuristic` once a trained `P_θ` exists to get
+§4.1's table; add `--shuffle` for §4.5 Table 2's Shuffle row.
+
+### 8.1 Running at §4.1 scale
+
+§4.1 evaluates on CyPortQA as a whole — **117,178 questions over 472 scenario keys**, no subsample
+is mentioned. The command for that is:
+
+```bash
+D:/Anaconda/python.exe scripts/run_generation.py --backend openai \
+  --scenario-limit 0 --retrieve 0 \
+  --dump reports/table1.jsonl --progress-every 1000
+```
+
+Both `0`s mean "the full release". Decisions that matter at this scale:
+
+* **Sampling is seeded and random, never a prefix.** `select_records` draws scenarios with
+  `random.Random(seed).sample` and then questions from the pool of everything they contain, so a
+  smaller `--retrieve` is a random subset of §4.1's population rather than a different population.
+  The old behaviour — sort the keys, concatenate, truncate — put `--scenario-limit 24 --retrieve 200`
+  entirely inside `ALEX_2022_Canaveral` (160) + `ALEX_2022_Jacksonville` (40): one storm, two ports,
+  644 hyperedges, reported as "24 scenarios".
+* **The hypergraph is built only over the scenarios the sample touches.** 40 sampled questions
+  spanning 36 scenarios build 22,776 hyperedges; the full release builds all 248,652 (13 s, 1.53 GB
+  of float32). Memory follows the sample, not the release.
+* **Embeddings are cache-first.** `artifacts/llm_cache/embeddings` already holds all 248,652
+  hyperedge vectors (1.6 GB, 256 shards), so a warm full run makes **zero** embedding calls;
+  questions get their own `artifacts/llm_cache/questions`. Passing `store=None` — which
+  `build_embeddings` used to do — would re-embed the entire corpus through the API.
+* **Generation is the whole cost.** Measured at 2.85–2.99 s/question on gpt-4o, 117,178 questions is
+  **≈ 81 h sequential**; the driver is single-threaded, so budget for it and use `--dump`. The dump is
+  an append-only JSONL written and flushed per question, so an interruption at hour 70 keeps the 70
+  hours already paid for.
+
+`scripts/preflight_full.py` prints the sample composition, the graph size and the cache hit count
+before any API work, and is the cheapest way to check a run is pointed at §4.1's population.
 
 ## 9. Citation
 

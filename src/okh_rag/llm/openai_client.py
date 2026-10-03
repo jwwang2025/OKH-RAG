@@ -13,7 +13,9 @@ precedence and overrides ``.env``.
 from __future__ import annotations
 
 import json
+import os
 import random
+import re
 import time
 from typing import Any, Mapping, Sequence
 
@@ -67,6 +69,46 @@ def _assert_strict_schema(schema: Mapping[str, Any], path: str = "$") -> None:
         _assert_strict_schema(items, f"{path}[]")
 
 
+# Error fragments used by OpenAI-compatible relays when they reject structured-output modes.
+_RESPONSE_FORMAT_UNSUPPORTED = (
+    "response_format",
+    "json_schema",
+    "structured output",
+    "json_object",
+)
+
+
+def _response_format_unsupported(exc: Exception) -> bool:
+    """True when a 400 rejects the ``response_format`` parameter itself (a capability gap).
+
+    Official OpenAI and relays phrase this differently, so match on the message rather
+    than the status code. Other 400s (bad schema, bad messages) must not trigger a
+    downgrade — retrying those in a weaker mode would hide a real client bug.
+    """
+    status = getattr(exc, "status_code", None)
+    if status is not None and status != 400:
+        return False
+    message = str(exc).lower()
+    return any(fragment in message for fragment in _RESPONSE_FORMAT_UNSUPPORTED)
+
+
+def _parse_json_object(content: str, schema_name: str) -> dict[str, Any]:
+    """Parse model content into a JSON object, tolerating ```json fences in weak modes."""
+    text = content.strip()
+    fence = re.match(r"^```(?:json)?\s*(.*?)\s*```$", text, flags=re.DOTALL | re.IGNORECASE)
+    if fence:
+        text = fence.group(1).strip()
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"model returned non-JSON content for schema {schema_name!r}: {content[:400]}"
+        ) from exc
+    if not isinstance(parsed, dict):
+        raise ValueError(f"model returned {type(parsed).__name__}, expected a JSON object")
+    return parsed
+
+
 class OpenAIBackend:
     """Concrete :class:`~okh_rag.llm.base.ModelBackend` over the OpenAI SDK.
 
@@ -88,6 +130,18 @@ class OpenAIBackend:
         self.cfg = cfg
         self._usage = Usage()
         self.cache = cache
+
+        # Structured-outputs capability ladder. Official OpenAI supports strict
+        # ``json_schema``; some OpenAI-compatible relays only support ``json_object``
+        # or no response_format at all. OKH_RAG_RESPONSE_FORMAT forces the starting
+        # rung ("schema" | "object" | "plain"); otherwise it is auto-downgraded when
+        # the API rejects a mode.
+        mode = os.environ.get("OKH_RAG_RESPONSE_FORMAT", "schema").strip().lower()
+        if mode not in ("schema", "object", "plain"):
+            raise ValueError(
+                f"OKH_RAG_RESPONSE_FORMAT={mode!r}; expected one of schema, object, plain"
+            )
+        self._json_mode = mode
 
         if client is None:
             try:
@@ -154,41 +208,82 @@ class OpenAIBackend:
             ValueError: If the API returns content that is not a JSON object.
         """
         _assert_strict_schema(schema)
-        payload: dict[str, Any] = {
-            "model": model,
-            "messages": messages_key(messages),
-            "temperature": temperature,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {"name": schema_name, "strict": True, "schema": dict(schema)},
-            },
-        }
-        key = cache_key(
-            kind="chat_json",
-            model=model,
-            payload=payload,
-            temperature=temperature,
+
+        schema_hint = (
+            "Return exactly one JSON object and nothing else — no markdown, no code fences, "
+            "no commentary. The object must conform to the following JSON Schema "
+            f"(schema name: {schema_name}):\n" + json.dumps(schema, ensure_ascii=False)
         )
+        rungs = ("schema", "object", "plain")
 
-        if self.cache is not None:
-            hit = self.cache.get(key)
-            if hit is not None:
-                return dict(hit)
+        parsed: dict[str, Any] | None = None
+        content = ""
+        mode = self._json_mode
+        while True:
+            payload = self._json_payload(mode, messages, model, temperature, schema, schema_name, schema_hint)
+            key = cache_key(
+                kind="chat_json",
+                model=model,
+                payload=payload,
+                temperature=temperature,
+            )
 
-        response = self._call_with_retry(lambda: self._client.chat.completions.create(**payload))
-        content = response.choices[0].message.content or ""
-        self._record_chat_usage(response)
+            if self.cache is not None:
+                hit = self.cache.get(key)
+                if hit is not None:
+                    return dict(hit)
 
-        try:
-            parsed = json.loads(content)
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"model returned non-JSON content for schema {schema_name!r}: {content[:400]}") from exc
-        if not isinstance(parsed, dict):
-            raise ValueError(f"model returned {type(parsed).__name__}, expected a JSON object")
+            try:
+                response = self._call_with_retry(lambda: self._client.chat.completions.create(**payload))
+            except Exception as exc:
+                if mode != rungs[-1] and _response_format_unsupported(exc):
+                    nxt = rungs[rungs.index(mode) + 1]
+                    print(
+                        f"  [llm] {type(self._client).__name__}: response_format={mode!r} unsupported "
+                        f"by this endpoint ({str(exc)[:160]}); falling back to {nxt!r}"
+                    )
+                    self._json_mode = nxt
+                    mode = nxt
+                    continue
+                raise
+            content = response.choices[0].message.content or ""
+            self._record_chat_usage(response)
+            parsed = _parse_json_object(content, schema_name)
 
-        if self.cache is not None:
-            self.cache.set(key, parsed)
-        return parsed
+            if self.cache is not None:
+                self.cache.set(key, parsed)
+            return parsed
+
+    def _json_payload(
+        self,
+        mode: str,
+        messages: Sequence[Mapping[str, str]],
+        model: str,
+        temperature: float,
+        schema: Mapping[str, Any],
+        schema_name: str,
+        schema_hint: str,
+    ) -> dict[str, Any]:
+        """Build the chat payload for one rung of the structured-output ladder."""
+        if mode == "schema":
+            return {
+                "model": model,
+                "messages": messages_key(messages),
+                "temperature": temperature,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {"name": schema_name, "strict": True, "schema": dict(schema)},
+                },
+            }
+        constrained = messages_key(messages) + [{"role": "user", "content": schema_hint}]
+        if mode == "object":
+            return {
+                "model": model,
+                "messages": constrained,
+                "temperature": temperature,
+                "response_format": {"type": "json_object"},
+            }
+        return {"model": model, "messages": constrained, "temperature": temperature}
 
     # -- embeddings --------------------------------------------------------
 

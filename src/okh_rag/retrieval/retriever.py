@@ -36,7 +36,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import Iterable, Protocol, runtime_checkable
+from typing import Iterable, Mapping, Protocol, runtime_checkable
 
 import numpy as np
 
@@ -91,6 +91,53 @@ def resolve_weights(cfg: Config, transition_variant: str) -> RetrievalWeights:
     if transition_variant == "none":
         return RetrievalWeights(lambda_=0.0, mu=0.0, nu=0.0, rho=0.0)
     return weights
+
+
+class _HorizonIndex:
+    """``(group, horizon) -> hyperedge ids``, plus the block-less cross-horizon edges.
+
+    Built once per retriever for the same reason as :class:`~okh_rag.retrieval.candidates.HypergraphIndex`:
+    which hyperedges belong to a horizon is a property of ``H``, not of the query, and rebuilding the
+    map per question would be a full scan of the hypergraph each time.
+
+    §A.2 step 4's cross-horizon change edges carry ``horizon_hours is None`` — they belong to no block —
+    which is why :attr:`cross` is a separate bucket: a caller that wants them asks for them, and one
+    that does not is not silently given a hyperedge that straddles every block.
+    """
+
+    __slots__ = ("by_horizon", "cross")
+
+    def __init__(self, hypergraph: KnowledgeHypergraph) -> None:
+        by_horizon: dict[tuple[str, int], list[str]] = {}
+        cross: dict[str, list[str]] = {}
+        for hyperedge_id, edge in hypergraph.hyperedges.items():
+            if edge.horizon_hours is None:
+                cross.setdefault(edge.group_id or "", []).append(hyperedge_id)
+            else:
+                by_horizon.setdefault((edge.group_id or "", edge.horizon_hours), []).append(hyperedge_id)
+        self.by_horizon: Mapping[tuple[str, int], tuple[str, ...]] = {
+            key: tuple(value) for key, value in by_horizon.items()
+        }
+        self.cross: Mapping[str, tuple[str, ...]] = {key: tuple(value) for key, value in cross.items()}
+
+    def universe(
+        self, group_id: str | None, horizon_hours: int | None, mode: str
+    ) -> tuple[str, ...] | None:
+        """The searchable ids for one question, or ``None`` when scoping does not apply.
+
+        ``None`` means "no restriction", not "empty" — an empty universe would make
+        :func:`~okh_rag.retrieval.candidates.scope_candidates` return an empty pool and the caller would
+        silently get no evidence. A group whose block cannot be found therefore falls back to the whole
+        group rather than to nothing.
+        """
+        if mode == "off" or horizon_hours is None or group_id is None:
+            return None
+        own = self.by_horizon.get((group_id, horizon_hours), ())
+        if not own:
+            return None
+        if mode == "own_block_plus_cross":
+            return tuple(dict.fromkeys((*own, *self.cross.get(group_id, ()))))
+        return own
 
 
 @dataclass(frozen=True)
@@ -159,7 +206,9 @@ class Retriever(Protocol):
         *,
         group_id: str | None = ...,
         allowed_ids: Iterable[str] | None = ...,
+        query_vector: np.ndarray | None = ...,
         length: int | None = ...,
+        horizon_hours: int | None = ...,
     ) -> RetrievalResult:
         """Retrieve ``Γ_q`` for a query."""
         ...
@@ -220,6 +269,7 @@ class OrderAwareRetriever:
         self.backend = backend
         self.store = store
         self.index = HypergraphIndex(hypergraph)
+        self._horizon_index = _HorizonIndex(hypergraph)
 
         self.transition_variant = transition_variant or cfg.ablation.transition_variant
         if self.transition_variant not in TRANSITION_VARIANTS:
@@ -286,6 +336,7 @@ class OrderAwareRetriever:
         allowed_ids: Iterable[str] | None = None,
         query_vector: np.ndarray | None = None,
         length: int | None = None,
+        horizon_hours: int | None = None,
     ) -> RetrievalResult:
         """Retrieve ``Γ_q`` for one query.
 
@@ -294,15 +345,29 @@ class OrderAwareRetriever:
             group_id: The query's knowledge group, when known. Drives §A.7's 40% reserve.
             allowed_ids: Optional whitelist for the searchable universe — the group-split guard. Pass the
                 training or test subset here when evaluating on a split; without it, retrieval would see
-                every group including the one it is being scored on.
+                every group including the one it is being scored on. Intersected with the horizon
+                universe when both apply.
             query_vector: A precomputed query embedding. Supplying one skips the API call; this is the
                 hook the smoke script and the tests use to run without a backend.
             length: ``L`` override, threaded to the inference algorithm.
+            horizon_hours: The question's own horizon block (``T-48`` → ``48``). Drives
+                ``retrieval.horizon_scoping``; see :class:`_HorizonIndex`. CyPortQA asks one question
+                text per block with a block-dependent gold, so without this the blocks are
+                indistinguishable to a cosine retriever and every block gets the same trajectory.
 
         Returns:
             A :class:`RetrievalResult`.
         """
         vector = query_vector if query_vector is not None else self.embed_query(query)
+        universe = self._horizon_index.universe(
+            group_id, horizon_hours, self.cfg.retrieval.horizon_scoping
+        )
+        if universe is not None:
+            if allowed_ids is None:
+                allowed_ids = universe
+            else:
+                keep = set(universe)
+                allowed_ids = [hid for hid in allowed_ids if hid in keep]
         pool = scope_candidates(
             self.hypergraph,
             self.embeddings,

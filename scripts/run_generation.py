@@ -25,13 +25,24 @@ The five things this driver exists to keep honest:
 5. **§A.8's two modes are both runnable**, so the paper's stated preference for single-call can be checked
    rather than trusted.
 
+**§4.1's sample is the whole benchmark.** §4.1 evaluates on "117,178 questions" over CyPortQA's full
+release — no subsample is mentioned anywhere in the section. The release on disk is that population:
+472 scenario keys, 10 horizon blocks, and a type mix of TF 5,812 / MC 37,813 / NU 49,459 / DE 24,094.
+:func:`select_records` therefore draws a **seeded random sample of that population**, never a prefix of
+it, and ``--scenario-limit 0 --retrieve 0`` means the full release. See :func:`_print_sample_composition`,
+which prints the run's mix next to §4.1's so the two can be compared.
+
 Usage::
 
     # wiring check, no API key, no real accuracy
     python scripts/run_generation.py --retrieve 40
 
-    # §4.1 as written (needs OPENAI_API_KEY)
-    python scripts/run_generation.py --backend openai --mode single_call
+    # §4.1 as written, on the full release (needs OPENAI_API_KEY; ~81 h sequential)
+    python scripts/run_generation.py --backend openai --scenario-limit 0 --retrieve 0 \
+        --dump reports/table1.jsonl --progress-every 1000
+
+    # a smaller random subset of the same population, for a quick read
+    python scripts/run_generation.py --backend openai --retrieve 2000
 
     # §4.5 Table 2's Shuffle row
     python scripts/run_generation.py --backend openai --shuffle
@@ -40,6 +51,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import collections
 import json
 import os
 import random
@@ -62,6 +74,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from okh_rag.config import Config, load_config  # noqa: E402
 from okh_rag.data.cyportqa import QARecord, load_corpus  # noqa: E402
 from okh_rag.embeddings import (  # noqa: E402
+    EmbeddingStore,
     HyperedgeEmbeddings,
     embed_texts,
     hyperedge_embedding_text,
@@ -230,6 +243,8 @@ class RunPlan:
     scenario_limit: int | None
     question_limit: int | None
     seed: int
+    dump: str | None = None
+    progress_every: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -239,34 +254,103 @@ class RunPlan:
             "scenario_limit": self.scenario_limit,
             "question_limit": self.question_limit,
             "seed": self.seed,
+            "dump": self.dump,
+            "progress_every": self.progress_every,
         }
 
 
-def select_records(corpus, *, scenario_limit: int | None, question_limit: int | None) -> list[QARecord]:
-    """A deterministic question sample: scenarios in sorted order, questions in release order.
+def select_records(
+    corpus,
+    *,
+    scenario_limit: int | None,
+    question_limit: int | None,
+    seed: int = 42,
+) -> list[QARecord]:
+    """A seeded random sample of §4.1's question population.
 
-    Sorted rather than taken in dict order, because dict order is insertion order derived from a JSON object
-    and is not a documented contract — a run whose sample changed because the loader's iteration changed
-    would be unreproducible for a reason that has nothing to do with the experiment.
+    §4.1 evaluates on CyPortQA as a whole: **117,178 questions over 472 scenario keys and 10 horizon
+    blocks**, no subsample is mentioned. A reproduction's sample therefore has to be a *random subset of
+    that population*, not a different population.
+
+    The previous implementation sorted the scenario keys, concatenated them, and truncated the flat
+    list. With ``--scenario-limit 24 --retrieve 200`` that stopped inside the second scenario
+    (ALEX_2022_Canaveral 160 + Jacksonville 40) — one storm, two ports, 644 hyperedges — so every
+    column in Table 1 was estimated on a single storm while the report claimed 24 scenarios. Worse,
+    ``--scenario-limit`` was silently inert for any question count below a scenario's own size.
+
+    Both stages are now drawn with a seeded RNG, the way ``scripts/run_retrieval_oracle.py`` already
+    does:
+
+    * scenarios — ``random.Random(seed).sample(all_scenarios, scenario_limit)``;
+    * questions — ``random.Random(seed).sample(pool, question_limit)`` over the pool of *every*
+      question belonging to the selected scenarios.
+
+    ``None`` (``--scenario-limit 0`` / ``--retrieve 0``) means the full release, which is §4.1's
+    setting. Sampling rather than sorting-and-truncating is what makes a smaller ``n`` defensible: it
+    is the same population measured less precisely, and the seed makes it reproducible.
+
+    Sampling is unstratified on purpose. CyPortQA's own mix (TF 5,812 / MC 37,813 / NU 49,459 /
+    DE 24,094) *is* the paper's mix, and a random draw reproduces it in expectation; stratifying would
+    silently reweight the micro-average away from the paper's denominator.
     """
-    scenario_ids = sorted(corpus.qa)
-    if scenario_limit is not None:
-        scenario_ids = scenario_ids[:scenario_limit]
-    records: list[QARecord] = []
+    rng = random.Random(seed)
+    all_scenarios = sorted(corpus.qa)
+    if scenario_limit is None or scenario_limit >= len(all_scenarios):
+        scenario_ids = list(all_scenarios)
+    else:
+        scenario_ids = sorted(rng.sample(all_scenarios, scenario_limit))
+
+    pool: list[QARecord] = []
     for scenario_id in scenario_ids:
-        records.extend(corpus.qa[scenario_id])
-    if question_limit is not None:
-        records = records[:question_limit]
-    return records
+        pool.extend(corpus.qa[scenario_id])
+    if question_limit is None or question_limit >= len(pool):
+        pool.sort(key=lambda record: record.qa_id)
+        return pool
+    sample = rng.sample(pool, question_limit)
+    sample.sort(key=lambda record: record.qa_id)
+    return sample
 
 
-def build_embeddings(graph, cfg: Config, embedder) -> HyperedgeEmbeddings:
-    """Embed every hyperedge of the reference graph, in sorted id order so the matrix is reproducible."""
+_PAPER_MIX: Mapping[str, int] = {"TF": 5812, "MC": 37813, "NU": 49459, "DE": 24094}
+"""§4.1's question mix over the whole release (117,178). Printed next to the run's own so a reader
+can see whether a Table 1 was measured on the paper's population or on a convenient corner of it."""
+
+
+def _print_sample_composition(records: Sequence[QARecord]) -> None:
+    """The sample's type / horizon / scenario mix, against §4.1's."""
+    formats = collections.Counter(record.answer_format.value for record in records)
+    horizons = collections.Counter(record.context.horizon_hours for record in records)
+    total = len(records)
+    print("  composition (vs §4.1's full release):")
+    for fmt in ("TF", "MC", "NU", "DE"):
+        share = formats[fmt] / total if total else 0.0
+        paper_share = _PAPER_MIX[fmt] / sum(_PAPER_MIX.values())
+        print(
+            f"    {fmt}: {formats[fmt]:7d} ({share:6.2%})   paper {_PAPER_MIX[fmt]:7d} "
+            f"({paper_share:6.2%})"
+        )
+    print(f"    horizons: {len(horizons)} distinct "
+          + " ".join(f"T-{h}={n}" for h, n in sorted(horizons.items())))
+    print(
+        f"    storms: {len({r.context.storm for r in records})}   "
+        f"templates: {len({r.template_id for r in records})}"
+    )
+
+
+def build_embeddings(graph, cfg: Config, embedder, store=None) -> HyperedgeEmbeddings:
+    """Embed every hyperedge of the reference graph, in sorted id order so the matrix is reproducible.
+
+    ``store`` must be passed at §4.1 scale. The full release is **248,652 hyperedges**, and embedding
+    them from scratch is ~248k API calls — hours of wall clock on top of a generation run already
+    measured at ~81 h, and it would have to be repeated after any interruption. The content-addressed
+    cache turns a warm run into zero calls; :func:`scripts.preflight_full.py` reports how many are
+    already cached.
+    """
     ordered_ids = tuple(sorted(graph.hypergraph.hyperedges))
     texts = [
         hyperedge_embedding_text(graph.hypergraph.hyperedges[hid], graph.hypergraph) for hid in ordered_ids
     ]
-    matrix = embed_texts(texts, backend=embedder, cfg=cfg, store=None)
+    matrix = embed_texts(texts, backend=embedder, cfg=cfg, store=store)
     return HyperedgeEmbeddings(hyperedge_ids=ordered_ids, matrix=matrix)
 
 
@@ -338,13 +422,42 @@ def run_source(
     result = SourceResult(source=source)
     started = time.time()
 
-    for record in records:
+    # A §4.1-scale run is ~81 h of sequential gpt-4o calls. Two things protect it: a progress line
+    # with an ETA, so a stall is distinguishable from slow progress, and an append-only JSONL dump, so
+    # an interruption at hour 70 does not discard 70 hours of paid answers. The dump is flushed per
+    # question because a buffered write is exactly what a crash loses.
+    dump_path = Path(plan.dump) if plan.dump else None
+    if dump_path is not None:
+        dump_path.parent.mkdir(parents=True, exist_ok=True)
+        dump_path.write_text("", encoding="utf-8")
+
+    def _dump(entry: dict) -> None:
+        if dump_path is None:
+            return
+        with dump_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    progress_every = plan.progress_every or 0
+    total = len(records)
+
+    for position, record in enumerate(records, start=1):
+        if progress_every and (position % progress_every == 0 or position == total):
+            elapsed = time.time() - started
+            rate = elapsed / position
+            remaining = (total - position) * rate
+            print(
+                f"    {position}/{total} ({position / total:.1%})  "
+                f"elapsed {elapsed / 3600:.2f}h  eta {remaining / 3600:.2f}h  "
+                f"({rate:.2f}s/question)",
+                flush=True,
+            )
         query_vector = query_vectors[record.qa_id]
         if source == "okh_rag":
             retrieval = retriever.retrieve(
                 record.question,
                 group_id=record.group_id,
                 query_vector=query_vector,
+                horizon_hours=record.context.horizon_hours,
             )
             context = context_from_retrieval(
                 retrieval,
@@ -365,6 +478,26 @@ def run_source(
         score = score_record(record, generated.answer.answer, cfg.evaluation)
         result.report.add(score, record.answer_format)
         result.n_questions += 1
+
+        _dump(
+            {
+                "position": position,
+                "qa_id": record.qa_id,
+                "template_id": record.template_id,
+                "scenario_id": record.scenario_id,
+                "horizon_hours": record.context.horizon_hours,
+                "format": record.answer_format.value,
+                "question": record.question,
+                "gold": record.answer if isinstance(record.answer, str) else json.dumps(record.answer, ensure_ascii=False),
+                "predicted": generated.answer.answer if isinstance(generated.answer.answer, str) else json.dumps(generated.answer.answer, ensure_ascii=False),
+                "correct": score.correct,
+                "scorable": score.scorable,
+                "reason": score.reason,
+                "detail": score.detail,
+                "conforming": generated.conforming,
+                "empty_context": context.is_empty,
+            }
+        )
 
     result.elapsed_s = time.time() - started
     return result
@@ -524,10 +657,39 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="path to a LearnedTransitionModel checkpoint (only used when the variant is 'learned')",
     )
-    parser.add_argument("--scenario-limit", type=int, default=24)
-    parser.add_argument("--retrieve", type=int, default=120, help="question cap (0 = all)")
+    parser.add_argument(
+        "--scenario-limit",
+        type=int,
+        default=0,
+        help="knowledge groups to build the hypergraph over; sampled with --seed from all 472. "
+        "0 = the full release (§4.1's setting)",
+    )
+    parser.add_argument(
+        "--retrieve",
+        type=int,
+        default=120,
+        help="questions to answer; sampled with --seed from every question of the selected "
+        "scenarios. 0 = all 117,178 (§4.1's setting)",
+    )
     parser.add_argument("--shuffle", action="store_true", help="Table 2's Shuffle row")
     parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument(
+        "--dump",
+        default=None,
+        help="append-only JSONL of every question's answer and score. Strongly recommended at "
+        "§4.1 scale: an interruption without it discards every answer already paid for",
+    )
+    parser.add_argument(
+        "--progress-every",
+        type=int,
+        default=100,
+        help="print progress and ETA every N questions (0 = silent)",
+    )
+    parser.add_argument(
+        "--cache-root",
+        default=str(REPO_ROOT / "artifacts" / "llm_cache"),
+        help="content-addressed embedding cache root; hyperedges and questions use subdirectories",
+    )
     return parser.parse_args(argv)
 
 
@@ -563,6 +725,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         scenario_limit=args.scenario_limit,
         question_limit=args.retrieve or None,
         seed=cfg.seed if args.seed is None else args.seed,
+        dump=args.dump,
+        progress_every=args.progress_every,
     )
     print("Plan:")
     for key, value in plan.as_dict().items():
@@ -574,17 +738,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     print("Loading corpus...")
     corpus = load_corpus(data_root)
     records = select_records(
-        corpus, scenario_limit=args.scenario_limit, question_limit=args.retrieve or None
+        corpus,
+        scenario_limit=args.scenario_limit or None,
+        question_limit=args.retrieve or None,
+        seed=plan.seed,
     )
     scenarios = sorted({record.scenario_id for record in records})
     print(f"  {len(records)} questions over {len(scenarios)} scenarios")
+    _print_sample_composition(records)
 
     print("Building the reference hypergraph...")
     graph = build_reference_graph(corpus, cfg=cfg, scenario_ids=scenarios)
     print(f"  {len(graph.hypergraph)} hyperedges, {len(graph.hypergraph.entities)} entities")
 
     embedder, generator_backend = build_backend(args.backend, cfg)
-    embeddings = build_embeddings(graph, cfg, embedder)
+    cache_root = Path(args.cache_root)
+    hyperedge_store = EmbeddingStore(cache_root / "embeddings", dim=cfg.order_model.embedding_dim)
+    print("Embedding hyperedges (cache-first)...")
+    embeddings = build_embeddings(graph, cfg, embedder, store=hyperedge_store)
 
     print("Building retrievers...")
     retrievers = build_retrievers(
@@ -592,14 +763,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
     print("Embedding queries...")
+    # Question texts repeat heavily (the same template is asked once per horizon block per port), so
+    # the cache collapses 117,178 questions onto a few thousand distinct strings.
+    question_store = EmbeddingStore(cache_root / "questions", dim=cfg.order_model.embedding_dim)
     query_vectors = {
         record.qa_id: vector
         for record, vector in zip(
             records,
-            embed_texts([record.question for record in records], backend=embedder, cfg=cfg, store=None),
+            embed_texts(
+                [record.question for record in records], backend=embedder, cfg=cfg, store=question_store
+            ),
             strict=True,
         )
     }
+    print(f"  cache: hyperedges {hyperedge_store.hits} hit / {hyperedge_store.misses} miss; "
+          f"questions {question_store.hits} hit / {question_store.misses} miss")
 
     generator = Generator(generator_backend, cfg)
     results: dict[str, SourceResult] = {}

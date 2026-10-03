@@ -240,8 +240,19 @@ def scope_candidates(
         return CandidatePool(hyperedge_ids=(), relevance=np.zeros(0, dtype=np.float64), group_id=group_id)
 
     positions = {hid: row for row, hid in enumerate(embeddings.hyperedge_ids)}
-    all_relevance = cosine_relevance(query_vector, embeddings.matrix)
-    relevance = {hid: float(all_relevance[positions[hid]]) for hid in universe}
+    if len(universe) == len(embeddings.hyperedge_ids):
+        # Nothing is excluded, so the full matrix is the cheapest thing to score.
+        all_relevance = cosine_relevance(query_vector, embeddings.matrix)
+        relevance = {hid: float(all_relevance[positions[hid]]) for hid in universe}
+    else:
+        # Score only the searchable universe. Reading the whole matrix and then masking it is the same
+        # result at O(|H|) work per query — at §4.1 scale that is 248,652 × 1536 per question, 117,178
+        # times, which is hours of arithmetic spent on rows that cannot enter the pool. Under
+        # ``horizon_scoping`` the universe is one horizon block (~46 hyperedges), so this is the
+        # difference between a full-release run being feasible and not.
+        rows = [positions[hid] for hid in universe]
+        scored = cosine_relevance(query_vector, embeddings.matrix[rows])
+        relevance = {hid: float(value) for hid, value in zip(universe, scored)}
 
     # --- stage 1: top-K cosine retrieval from the global index -----------------
     ranked = _rank_by_relevance(universe, relevance)

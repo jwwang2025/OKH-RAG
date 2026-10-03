@@ -94,10 +94,21 @@ __all__ = [
 # ---------------------------------------------------------------------------
 
 
+#: Rows per block in :func:`cosine_relevance`. 8192 × 1536 × 8 B ≈ 100 MB, which keeps the peak
+#: allocation bounded no matter how large ``H`` is — see that function for why it is blocked at all.
+_COSINE_BLOCK_ROWS: int = 8192
+
+
 def _unit_rows(matrix: np.ndarray) -> np.ndarray:
     """Row-wise L2 normalisation, mapping zero-norm rows to the zero row instead of NaN."""
-    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
-    return matrix / np.where(norms > 0.0, norms, 1.0)
+    norms = np.sqrt(np.einsum("ij,ij->i", matrix, matrix))
+    return matrix / np.where(norms > 0.0, norms[:, None], 1.0)
+
+
+def _cosine_block(query_unit: np.ndarray, block: np.ndarray) -> np.ndarray:
+    """``cos(h_e, q)`` for one block of rows, in float64, without normalising the block in place."""
+    norms = np.sqrt(np.einsum("ij,ij->i", block, block))
+    return (block @ query_unit) / np.where(norms > 0.0, norms, 1.0)
 
 
 def cosine_relevance(query: np.ndarray, matrix: np.ndarray) -> np.ndarray:
@@ -122,9 +133,16 @@ def cosine_relevance(query: np.ndarray, matrix: np.ndarray) -> np.ndarray:
     A zero-norm row or query yields 0.0 for that entry rather than NaN. The OpenAI endpoint never
     returns one, but synthetic corpora in tests do, and a single NaN would propagate through the beam
     comparison into an arbitrary winner with no error raised anywhere.
+
+    **Blocked, not vectorised whole.** The float64 rationale above used to be paid for by materialising
+    a float64 copy of ``matrix`` *and* its row-normalised form. At §4.1 scale that is
+    248,652 × 1536 × 8 B = **3.05 GB, allocated and freed once per query** — which is not merely slow
+    but fatal: a full-release run dies with ``_ArrayMemoryError`` on the first question. The result is
+    unchanged; only the peak allocation is, because the rows are normalised and multiplied in blocks of
+    :data:`_COSINE_BLOCK_ROWS` and only the ``(n,)`` output is ever held.
     """
     q = np.asarray(query, dtype=np.float64).reshape(-1)
-    m = np.asarray(matrix, dtype=np.float64)
+    m = np.asarray(matrix)
     if m.ndim != 2:
         raise ValueError(f"hyperedge embedding matrix must be 2-d, got shape {m.shape}")
     if m.shape[1] != q.shape[0]:
@@ -133,7 +151,13 @@ def cosine_relevance(query: np.ndarray, matrix: np.ndarray) -> np.ndarray:
     query_norm = float(np.linalg.norm(q))
     if query_norm == 0.0:
         return np.zeros(m.shape[0], dtype=np.float64)
-    return _unit_rows(m) @ (q / query_norm)
+    query_unit = q / query_norm
+
+    out = np.empty(m.shape[0], dtype=np.float64)
+    for start in range(0, m.shape[0], _COSINE_BLOCK_ROWS):
+        stop = min(start + _COSINE_BLOCK_ROWS, m.shape[0])
+        out[start:stop] = _cosine_block(query_unit, np.asarray(m[start:stop], dtype=np.float64))
+    return out
 
 
 # ---------------------------------------------------------------------------

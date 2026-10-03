@@ -1,17 +1,17 @@
 # §4.1 generation evaluation
 
-> **These are not §4.1's numbers.** The backend is `lexical`: a deterministic token-overlap embedder and a stub generator that never reads the evidence. The run checks that the pipeline is wired — four methods, one generator, one question set, one scorer — and nothing about accuracy. Re-run with `--backend openai` to reproduce §4.1.
-
 ## Run
 
 | field | value |
 |---|---|
-| `backend` | lexical |
+| `backend` | openai |
 | `answer_mode` | single_call |
 | `shuffle_trajectory` | False |
-| `scenario_limit` | 24 |
-| `question_limit` | 20 |
+| `scenario_limit` | 0 |
+| `question_limit` | 200 |
 | `seed` | 42 |
+| `dump` | reports/generation_eval.jsonl |
+| `progress_every` | 50 |
 | `generator_model` | `gpt-4o` |
 | `td_scoring` | `exact_match` |
 | `exclude_unanswerable` | True |
@@ -20,19 +20,19 @@
 
 | method | TF | MC | SA (NU) | TD (DE) | overall (micro) | overall (macro) |
 |---|---|---|---|---|---|---|
-| `okh_rag` | 100.0% | 50.0% | — | 0.0% | 42.1% | 50.0% |
+| `okh_rag` | 100.0% | 64.5% | 49.2% | 14.0% | 48.3% | 56.9% |
 
 ## Denominators and exclusions
 
 | method | questions | scorable | unanswerable | SA gold not numeric | empty context | non-conforming |
 |---|---|---|---|---|---|---|
-| `okh_rag` | 20 | 19 | 1 | 0 | 0 | 0 |
+| `okh_rag` | 200 | 176 | 13 | 11 | 0 | 26 |
 
 ## Per-format denominators
 
-| method | DE (scorable/total) | MC (scorable/total) | TF (scorable/total) |
-|---|---|---|---|
-| `okh_rag` | 7/8 | 8/8 | 4/4 |
+| method | DE (scorable/total) | MC (scorable/total) | NU (scorable/total) | TF (scorable/total) |
+|---|---|---|---|---|
+| `okh_rag` | 43/46 | 62/62 | 63/84 | 8/8 |
 
 ## How to read this
 
